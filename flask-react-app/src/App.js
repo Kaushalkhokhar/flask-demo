@@ -1,12 +1,14 @@
 import { Fragment } from "react";
-import UserForm from "./components/users/UserForm";
+import AddUser from "./components/users/AddUser";
+import Users from "./components/users/Users";
 
 function App() {
   
 
   return (
     <Fragment>
-      <UserForm />
+      <Users />
+      <AddUser />
     </Fragment>
   );
 }

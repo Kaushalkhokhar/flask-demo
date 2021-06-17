@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import UserList from "./UserList";
 import LoadingSpinner from "../../UI/LoadingSpinner";
 
@@ -10,7 +10,7 @@ const Users = () => {
   useEffect(() => {
     setIsLoading(true);
     const getUser = async () => {
-      const response = await fetch("http://127.0.0.1:5000/get_users");
+      const response = await fetch("/get_users");
 
       if (!response.ok) {
         throw new Error("Data has not fetched. Please refresh the page again");

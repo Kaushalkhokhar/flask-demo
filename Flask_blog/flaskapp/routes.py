@@ -136,7 +136,6 @@ def delete_post(post_id):
     return redirect(url_for('home'))
 
 @app.route("/get_users")
-@cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
 def get_users():
     users = User.query.all()
     formated_user = []
@@ -147,6 +146,7 @@ def get_users():
 @app.route('/add_user', methods=['POST'])
 def add_user():
     user = request.get_json()
+    print(user)
 
     hashed_pw = bcrypt.generate_password_hash(user["password"]).decode('utf-8')
 

@@ -1,4 +1,4 @@
-const Users = (props) => {
+const UserList = (props) => {
   const users_list = props.users.map((user) => {
     return <li key={user.username}>{user.username}</li>;
   });
@@ -6,4 +6,4 @@ const Users = (props) => {
   return <ul>{users_list}</ul>;
 };
 
-export default Users;
+export default UserList;

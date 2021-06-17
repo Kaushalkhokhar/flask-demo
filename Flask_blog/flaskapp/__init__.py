@@ -11,9 +11,9 @@ app.config['SECRET_KEY'] = '523b5a760673e5af972e7c0d308d7bc2'
 # To generate secret key secrets.token_hex(16)
 
 # this is for react specific to allow CORS
-app.config['CORS_HEADERS'] = 'Content-Type'
+# app.config['CORS_HEADERS'] = 'Content-Type'
 
-cors = CORS(app, resources={r"/get_users": {"origins": "http://localhost:3000"}})
+# cors = CORS(app, resources={r"/get_users": {"origins": "http://localhost:3000"}})
 
 # This is for database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
