@@ -3,27 +3,34 @@ import LoadingSpinner from "../../UI/LoadingSpinner";
 import UserForm from "./UserForm";
 
 const AddUser = (props) => {
+  const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const sendUser = async (data, resetAll) => {
     setIsLoading(true);
-    setError(false)
+    setError(false);
+    setIsSuccess(false)
     try {
-      const response = await fetch(
-        // "https://react-http-9da4e-default-rtdb.firebaseio.com/add_user.jsons",
-        "/add_user",
-        {
-          method: "POST",
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch("/add_user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Header is necessary to fetch flask urls properly otherwise produce an error
+        body: JSON.stringify(data),
+      });
 
       if (!response.ok) {
-        throw new Error("Something went wrong.Please submit the form again.");
+        const json = await response.json();
+        const error_response = await json.error;
+        const split_index = error_response.indexOf(":") + 1;
+        console.log(split_index);
+        throw new Error(error_response.slice(split_index));
       }
 
       resetAll();
+      setIsSuccess(true)
     } catch (err) {
       setError(err.message);
     }
@@ -32,9 +39,10 @@ const AddUser = (props) => {
 
   return (
     <Fragment>
-      <UserForm onAddUser={sendUser} />
+      <UserForm onAddUser={sendUser} error={error} />
       {isLoading && !error && <LoadingSpinner />}
       {error && <p>{error}</p>}
+      {isSuccess && <p>Data Uploaded Successfully</p>}
     </Fragment>
   );
 };

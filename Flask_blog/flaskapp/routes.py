@@ -1,7 +1,7 @@
 import os
 import secrets
 from PIL import Image
-from flask import render_template, flash, redirect, url_for, request, jsonify
+from flask import render_template, flash, redirect, url_for, request, jsonify, abort
 from flask_cors import cross_origin
 from flask_login import login_user, login_required, logout_user, current_user
 from flaskapp import app, db, bcrypt
@@ -143,10 +143,26 @@ def get_users():
         formated_user.append({'username': user.username, 'email': user.email })
     return jsonify({'users': formated_user})
 
+@app.errorhandler(404)
+def resource_not_found(e):
+    return jsonify(error=str(e)), 404
+
+
 @app.route('/add_user', methods=['POST'])
 def add_user():
     user = request.get_json()
-    print(user)
+
+    username_and_email_exist = User.query.filter_by(username=user["username"], email=user['email']).first()
+    if username_and_email_exist:
+        abort(404, description="Username and email are already taken.Please enter another values")
+    
+    username_exist = User.query.filter_by(username=user["username"]).first()
+    if username_exist:
+        abort(404, description="Username is already taken.Please enter another values")
+
+    email_exist = User.query.filter_by(email=user["email"]).first()
+    if email_exist:
+        abort(404, description="Email is already taken.Please enter another values")
 
     hashed_pw = bcrypt.generate_password_hash(user["password"]).decode('utf-8')
 
