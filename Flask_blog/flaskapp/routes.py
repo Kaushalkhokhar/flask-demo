@@ -140,7 +140,7 @@ def get_users():
     users = User.query.all()
     formated_user = []
     for user in users: 
-        formated_user.append({'username': user.username, 'email': user.email })
+        formated_user.append({'username': user.username, 'email': user.email})
     return jsonify({'users': formated_user})
 
 @app.errorhandler(404)

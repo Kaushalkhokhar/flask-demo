@@ -1,38 +1,10 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment } from "react";
 import UserList from "./UserList";
-import LoadingSpinner from "../../UI/LoadingSpinner";
 
-const Users = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    const getUser = async () => {
-      const response = await fetch("/get_users");
-
-      if (!response.ok) {
-        throw new Error("Data has not fetched. Please refresh the page again");
-      }
-
-      const data = await response.json();
-      setUsers(data.users);
-    };
-    try {
-      getUser();
-    } catch (err) {
-      setError(err.message);
-    }
-    setIsLoading(false);
-  }, []);
-
+const Users = (props) => {
   return (
     <Fragment>
-      {!isLoading && !error && users.length === 0 && <p>No users are added</p>}
-      {!isLoading && !error && users.length > 0 && <UserList users={users} />}
-      {isLoading && !error && <LoadingSpinner />}
-      {!isLoading && error && <p>{error}</p>}
+      <UserList users={props.users} />
     </Fragment>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useCallback } from "react";
 import LoadingSpinner from "../../UI/LoadingSpinner";
 import UserForm from "./UserForm";
 
@@ -7,7 +7,7 @@ const AddUser = (props) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const sendUser = async (data, resetAll) => {
+  const sendUser = useCallback(async (data, resetAll) => {
     setIsLoading(true);
     setError(false);
     setIsSuccess(false)
@@ -29,17 +29,19 @@ const AddUser = (props) => {
         throw new Error(error_response.slice(split_index));
       }
 
-      resetAll();
+      if (resetAll) {
+        resetAll();
+      }
       setIsSuccess(true)
     } catch (err) {
       setError(err.message);
     }
     setIsLoading(false);
-  };
+  },[]);
 
   return (
     <Fragment>
-      <UserForm onAddUser={sendUser} error={error} />
+      <UserForm onAddUser={sendUser} error={error} users={props.users}/>
       {isLoading && !error && <LoadingSpinner />}
       {error && <p>{error}</p>}
       {isSuccess && <p>Data Uploaded Successfully</p>}

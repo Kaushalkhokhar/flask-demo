@@ -3,7 +3,7 @@
   flex-direction: column;
   /* align-items: center; */
   max-width: 22rem;
-  margin: auto;
+  margin: 1rem auto;
 
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   background-color: white;
@@ -89,4 +89,15 @@ button:disabled:active {
 
 .error-text {
   color: #b40e0e;
+  font-size: 0.6rem;
+}
+
+.valid-text {
+  color: rgb(68, 55, 146);
+  font-size: 0.6rem;
+}
+
+.info-text {
+  color: gray;
+  font-size: 0.6rem;
 }
