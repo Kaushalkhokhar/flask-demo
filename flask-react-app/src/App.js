@@ -5,31 +5,31 @@ import LoadingSpinner from "./UI/LoadingSpinner";
 
 import './index.css';
 
-
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
 
+  const getUser = async () => {
+    const response = await fetch("/get_users");
+
+    if (!response.ok) {
+      throw new Error("Data has not fetched. Please refresh the page again");
+    }
+
+    const data = await response.json();
+    setUsers(data.users);
+  };
+
   useEffect(() => {
     setIsLoading(true);
-    const getUser = async () => {
-      const response = await fetch("/get_users");
-
-      if (!response.ok) {
-        throw new Error("Data has not fetched. Please refresh the page again");
-      }
-
-      const data = await response.json();
-      setUsers(data.users);
-    };
     try {
       getUser();
     } catch (err) {
       setError(err.message);
     }
     setIsLoading(false);
-  }, []);
+  },[]);
 
   return (
     <div className={'row container'}>
@@ -37,7 +37,7 @@ function App() {
       {!isLoading && !error && users.length > 0 && <Users users={users} />}
       {isLoading && !error && <LoadingSpinner />}
       {!isLoading && error && <p>{error}</p>}
-      <AddUser users={users}/>
+      <AddUser users={users} onGetUser={getUser}/>
     </div>
   );
 }

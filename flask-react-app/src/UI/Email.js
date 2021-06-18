@@ -12,6 +12,7 @@ const Email = (props) => {
         emailNotExist = false;
       }
     }
+    // return re.test(value) && emailNotExist;
     return re.test(value) && emailNotExist;
   };
 
@@ -42,7 +43,7 @@ const Email = (props) => {
     emailReset,
     emailInputIsInvalid,
   ]);
-  
+
   const emailInputClasses = emailInputIsInvalid
     ? `${classes["form-control"]} ${classes.invalid}`
     : classes["form-control"];

@@ -1,5 +1,4 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import useInput from "../../hooks/use-input";
 import Username from "../../UI/Username";
 import Email from "../../UI/Email";
 import Password from "../../UI/Password";

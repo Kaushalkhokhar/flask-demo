@@ -1,4 +1,5 @@
 import os
+import re
 import secrets
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify, abort
@@ -163,6 +164,23 @@ def add_user():
     email_exist = User.query.filter_by(email=user["email"]).first()
     if email_exist:
         abort(404, description="Email is already taken.Please enter another values")
+
+    # remove backslash(/) from start and end when copy regex from javascript
+    # username_validation = r"^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$"
+    username_validation = r"^[a-zA-Z0-9]+$" 
+    user_match = re.match(username_validation, user["username"])
+    if user_match is None:
+        abort(404, description="Please enter valid username of minimum 8 characters")
+
+    email_validation = r'^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+    email_match = re.match(email_validation, user["email"])
+    if email_match is None:
+        abort(404, description="Please enter valid email. i.e example@demo.com")
+
+    password_validation = r'^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$'
+    password_match = re.match(password_validation, user["password"])
+    if password_match is None:
+        abort(404, description="Please enter valid password. i.e Example@1234")
 
     hashed_pw = bcrypt.generate_password_hash(user["password"]).decode('utf-8')
 

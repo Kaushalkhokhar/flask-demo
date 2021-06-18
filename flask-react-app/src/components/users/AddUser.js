@@ -7,6 +7,8 @@ const AddUser = (props) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { onGetUser } = props
+
   const sendUser = useCallback(async (data, resetAll) => {
     setIsLoading(true);
     setError(false);
@@ -21,23 +23,25 @@ const AddUser = (props) => {
         body: JSON.stringify(data),
       });
 
+      // console.log(response);
       if (!response.ok) {
         const json = await response.json();
         const error_response = await json.error;
+        console.log(error_response);
         const split_index = error_response.indexOf(":") + 1;
-        console.log(split_index);
         throw new Error(error_response.slice(split_index));
       }
 
       if (resetAll) {
         resetAll();
       }
+      onGetUser()
       setIsSuccess(true)
     } catch (err) {
       setError(err.message);
     }
     setIsLoading(false);
-  },[]);
+  },[onGetUser]);
 
   return (
     <Fragment>

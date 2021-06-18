@@ -13,7 +13,7 @@ const Username = (props) => {
       }
     }
     username_length = value.trim().length;
-    return re.test(value) && userNotExist && username_length > 6;
+    return re.test(value) && userNotExist && username_length > 7;
   };
 
   const {
@@ -54,12 +54,12 @@ const Username = (props) => {
         value={nameInputValue}
         placeholder="Username"
       />
-      {!nameDeFocused && username_length <= 6 && username_length > 0 && (
+      {!nameDeFocused && username_length <= 7 && username_length > 0 && (
         <p className={classes["info-text"]}>
           Username should be atleast six character long
         </p>
       )}
-      {nameDeFocused && username_length <= 6 && username_length > 0 && (
+      {nameDeFocused && username_length <= 7 && username_length > 0 && (
         <p className={classes["error-text"]}>
           Username should be atleast six character long
         </p>
@@ -69,12 +69,12 @@ const Username = (props) => {
           Username can not be blank. Please enter some text
         </p>
       )}
-      {nameInputIsInvalid && !userNotExist && username_length > 6 && (
+      {nameInputIsInvalid && !userNotExist && username_length > 7 && (
         <p className={classes["error-text"]}>
           Username is not availabel.Please enter some other value
         </p>
       )}
-      {!nameInputIsInvalid && username_length > 6 && (
+      {!nameInputIsInvalid && username_length > 7 && (
         <p className={classes["valid-text"]}>Username is available</p>
       )}
     </div>
