@@ -212,15 +212,13 @@ def login_user():
 
     token = jwt.encode({'user_id' : user.id, 
                             'exp' : datetime.datetime.utcnow() + 
-                            datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
-    print(token)
-    print
+                            datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm="HS256")
     return jsonify({'token': token})
     
 
 def login_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
+    # @wraps(f)
+    def wrapper(*args, **kwargs):
         token = None
 
         if 'x-access-token' in request.headers:
@@ -230,9 +228,7 @@ def login_required(f):
             return jsonify({'message': 'Token is missing'}), 401
 
         try:
-            print(app.config['SECRET_KEY'])
-            data = jwt.decode(token, app.config['SECRET_KEY'])
-            print(token)
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = User.query.filter_by(id=data['user_id']).first()
         except:
             return jsonify({'message' : 'Token is invalid!'}), 401
@@ -240,7 +236,7 @@ def login_required(f):
 
         return f(current_user, *args, **kwargs)
 
-    return decorated
+    return wrapper
 
 @app.route('/about_page')
 @login_required
