@@ -1,0 +1,27 @@
+.nav {
+    width: 100%;
+    height: auto;
+
+    background-color: #001f60;
+}
+
+.nav__links {
+    display: flex;
+    flex-wrap: wrap;
+
+    width: 75%;
+    margin: auto;
+}
+
+.nav__link {
+    display: block;
+    color: white;
+
+    padding: 0.8rem 0.5rem;
+}
+
+.nav__link:hover,
+.nav__link:active, 
+.active {
+    background-color: #142f69;
+}

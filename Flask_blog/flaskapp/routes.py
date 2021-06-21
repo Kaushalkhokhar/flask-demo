@@ -1,10 +1,14 @@
 import os
 import re
 import secrets
+import jwt
+import datetime
 from PIL import Image
-from flask import render_template, flash, redirect, url_for, request, jsonify, abort
+from flask import json, render_template, flash, redirect, url_for, request, jsonify, abort, make_response
+from functools import wraps
 from flask_cors import cross_origin
 from flask_login import login_user, login_required, logout_user, current_user
+from werkzeug.wrappers.request import PlainRequest
 from flaskapp import app, db, bcrypt
 from flaskapp.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskapp.models import Post, User
@@ -189,3 +193,57 @@ def add_user():
     db.session.commit()
 
     return 'Done', 201 
+
+@app.route('/login_user', methods=['POST'])
+def login_user():
+    formData = request.get_json()
+
+    if not formData or not formData['email'] or not formData['password']:
+        return jsonify({"message": 'Please fill the form correctly'}), 401
+
+    user = User.query.filter_by(email=formData['email']).first()
+
+    if not user:
+        return jsonify({"message": 'Please enter valid email'}), 401
+
+    if not bcrypt.check_password_hash(user.password, formData['password']):
+        return jsonify({"message": 'Password is incorrect'}), 401
+
+
+    token = jwt.encode({'user_id' : user.id, 
+                            'exp' : datetime.datetime.utcnow() + 
+                            datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
+    print(token)
+    print
+    return jsonify({'token': token})
+    
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token:
+            return jsonify({'message': 'Token is missing'}), 401
+
+        try:
+            print(app.config['SECRET_KEY'])
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            print(token)
+            current_user = User.query.filter_by(id=data['user_id']).first()
+        except:
+            return jsonify({'message' : 'Token is invalid!'}), 401
+
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
+@app.route('/about_page')
+@login_required
+def about_page(current_user):
+    
+    return jsonify({'message': 'This is about root'}), 201

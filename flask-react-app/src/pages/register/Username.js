@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import useInput from "../hooks/use-input";
-import classes from "../components/users/UserForm.module.css";
+import useInput from '../../hooks/use-input';
+import classes from "./Username.module.css";
 
 const Username = (props) => {
   let userNotExist = true;

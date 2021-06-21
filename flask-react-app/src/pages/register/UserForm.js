@@ -1,8 +1,10 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
-import Username from "../../UI/Username";
-import Email from "../../UI/Email";
-import Password from "../../UI/Password";
-import ConfPassword from "../../UI/ConfPassword";
+import { useCallback, useEffect, useState } from "react";
+import Card from "../../UI/Card";
+import Button from "../../UI/Button";
+import Username from "./Username";
+import Email from "./Email";
+import Password from "./Password";
+import ConfPassword from "./ConfPassword";
 
 import classes from "./UserForm.module.css";
 
@@ -116,17 +118,20 @@ const UserForm = (props) => {
   };
 
   return (
-    <Fragment>
-      <form onSubmit={onSubmitHandler} className={classes.form}>
+    <Card className={classes.form}>
+      <form onSubmit={onSubmitHandler}>
         <Username onPassNameData={passNameData} currenteUsers={currenteUsers} />
         <Email onPassEmailData={passEmailData} currenteUsers={currenteUsers} />
         <Password onPassPasswordData={passPasswordData} />
-        <ConfPassword onPassConfPasswordData={passConfPasswordData} passwordInputValue={passwordData.passwordInputValue}/>
-        <div className="form-actions">
-          <button disabled={!formIsValid}>Submit</button>
-        </div>
+        <ConfPassword
+          onPassConfPasswordData={passConfPasswordData}
+          passwordInputValue={passwordData.passwordInputValue}
+        />
+        <Button disabled={!formIsValid} type="submit">
+          Submit
+        </Button>
       </form>
-    </Fragment>
+    </Card>
   );
 };
 
