@@ -3,44 +3,41 @@ import useInput from "../../hooks/use-input";
 import classes from "./ConfPassword.module.css";
 
 const ConfPassword = (props) => {
-  let confPasswordLength = 0;
   const validateConfPassword = (value) => {
     const isMatched = props.passwordInputValue === value;
-    confPasswordLength = value.trim().length;
     return isMatched;
   };
-
+  const url = "/add_user";
   const {
     enteredValue: confPasswordInputValue,
     isTouched: confPasswordIsTouched,
     deFocused: confPasswordDeFocused,
-    valueIsValid: confPasswordIsValid,
-    inputIsInvalid: confPasswordInputIsInvalid,
+    inputIsValid: confPasswordInputIsValid,
     inputChangeHandler: confPasswordChangeHandler,
     inputBlurHandler: confPasswordBlurHandler,
     reset: confPasswordReset,
-  } = useInput(validateConfPassword);
+  } = useInput(url, "confirmPassword", validateConfPassword);
 
   const { onPassConfPasswordData: passConfPasswordData } = props;
 
   useEffect(() => {
     passConfPasswordData(
       confPasswordInputValue,
-      confPasswordIsValid,
       confPasswordReset,
-      confPasswordInputIsInvalid
+      confPasswordInputIsValid
     );
   }, [
     passConfPasswordData,
     confPasswordInputValue,
-    confPasswordIsValid,
     confPasswordReset,
-    confPasswordInputIsInvalid,
+    confPasswordInputIsValid,
   ]);
 
-  const confPasswordInputClasses = confPasswordInputIsInvalid
-    ? `${classes["form-control"]} ${classes.invalid}`
-    : classes["form-control"];
+
+  const confPasswordInputClasses =
+    !confPasswordInputIsValid && confPasswordIsTouched
+      ? `${classes["form-control"]} ${classes.invalid}`
+      : classes["form-control"];
 
   return (
     <div className={confPasswordInputClasses}>
@@ -55,20 +52,19 @@ const ConfPassword = (props) => {
       />
       {!confPasswordDeFocused &&
         confPasswordIsTouched &&
-        confPasswordInputIsInvalid && (
+        !confPasswordInputIsValid && (
           <p className={classes["info-text"]}>
             Password and confirm password must be same
           </p>
         )}
       {confPasswordDeFocused &&
         confPasswordIsTouched &&
-        confPasswordInputIsInvalid &&
-        confPasswordLength > 0 && (
+        !confPasswordInputIsValid && (
           <p className={classes["error-text"]}>
             Password and confirm password must be same
           </p>
         )}
-      {!confPasswordInputIsInvalid && confPasswordIsTouched && confPasswordLength > 0 && (
+      {confPasswordInputIsValid && (
         <p className={classes["valid-text"]}>
           Password and confirm password matched.
         </p>

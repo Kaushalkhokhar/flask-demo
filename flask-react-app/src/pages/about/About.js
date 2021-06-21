@@ -20,7 +20,7 @@ const About = () => {
         throw new Error(error.message);
       }
       const data = await response.json();
-      setIsSccess(data.message);
+      setIsSccess({username:data.username, email:data.email});
     } catch (err) {
       setError(err.message);
     }
@@ -33,7 +33,7 @@ const About = () => {
   return (
     <Fragment>
       <p>{ctx.token}</p>
-      {isSuccess && <p>{isSuccess}</p>}
+      {isSuccess && <p>{isSuccess.email}</p>}
       {error && <p>{error}</p>}
     </Fragment>
   );

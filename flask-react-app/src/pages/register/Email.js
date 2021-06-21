@@ -3,48 +3,34 @@ import useInput from "../../hooks/use-input";
 import classes from "./Email.module.css";
 
 const Email = (props) => {
-  let emailNotExist = true;
-  const validateEmail = (value) => {
-    const re =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    for (const user in props.currenteUsers) {
-      if (props.currenteUsers[user].email === value) {
-        emailNotExist = false;
-      }
-    }
-    // return re.test(value) && emailNotExist;
-    return re.test(value) && emailNotExist;
-  };
-
+  const url = '/add_user'
   const {
     enteredValue: emailInputValue,
     isTouched: emailIsTouched,
     deFocused: emailDeFocused,
-    valueIsValid: emailIsValid,
-    inputIsInvalid: emailInputIsInvalid,
+    inputIsValid: emailInputIsValid,
+    errorResponse: emailErrorResponse,
     inputChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHandler,
     reset: emailReset,
-  } = useInput(validateEmail);
+  } = useInput(url, "email");
 
   const { onPassEmailData: passEmailData } = props;
 
   useEffect(() => {
     passEmailData(
       emailInputValue,
-      emailIsValid,
       emailReset,
-      emailInputIsInvalid
+      emailInputIsValid
     );
   }, [
     passEmailData,
     emailInputValue,
-    emailIsValid,
     emailReset,
-    emailInputIsInvalid,
+    emailInputIsValid,
   ]);
 
-  const emailInputClasses = emailInputIsInvalid
+  const emailInputClasses = !emailInputIsValid && emailIsTouched
     ? `${classes["form-control"]} ${classes.invalid}`
     : classes["form-control"];
 
@@ -59,26 +45,19 @@ const Email = (props) => {
         value={emailInputValue}
         placeholder="Email"
       />
-      {!emailDeFocused &&
-        emailIsTouched &&
-        emailInputIsInvalid &&
-        emailNotExist && (
-          <p className={classes["info-text"]}>
-            Email should be like. i.e example@demo.com
-          </p>
+      {emailErrorResponse && !emailDeFocused && (
+        <p className={classes["info-text"]}>{emailErrorResponse}</p>
+      )}
+      {emailErrorResponse && emailDeFocused && (
+        <p className={classes["error-text"]}>{emailErrorResponse}</p>
+      )}
+      {!emailErrorResponse &&
+        emailDeFocused &&
+        emailInputValue.trim().length === 0 && (
+          <p className={classes["error-text"]}>Email can not be blank</p>
         )}
-      {emailDeFocused && emailInputIsInvalid && emailNotExist && (
-        <p className={classes["error-text"]}>
-          Email should be like. i.e example@demo.com
-        </p>
-      )}
-      {emailInputIsInvalid && !emailNotExist && emailIsTouched && (
-        <p className={classes["error-text"]}>
-          Email address is not avalilable. Please enter some other values.
-        </p>
-      )}
-      {!emailInputIsInvalid && emailNotExist && emailIsTouched && (
-        <p className={classes["valid-text"]}>Email address is avalilable.</p>
+      {emailInputIsValid && (
+        <p className={classes["valid-text"]}>Email is available</p>
       )}
     </div>
   );

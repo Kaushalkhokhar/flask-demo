@@ -3,38 +3,36 @@ import useInput from "../../hooks/use-input";
 import classes from "./Password.module.css";
 
 const Password = (props) => {
-  let passwordLength = 0;
-  const validatePassword = (value) => {
-    const re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-    passwordLength = value.trim().length;
-    return re.test(value) && passwordLength >= 8;
-  };
-
+  
+  const url = '/add_user'
   const {
     enteredValue: passwordInputValue,
     isTouched: passwordIsTouched,
     deFocused: passwordDeFocused,
-    valueIsValid: passwordIsValid,
-    inputIsInvalid: passwordInputIsInvalid,
+    inputIsValid: passwordInputIsValid,
+    errorResponse: passwordErrorResponse,
     inputChangeHandler: passwordChangeHandler,
     inputBlurHandler: passwordBlurHandler,
     reset: passwordReset,
-  } = useInput(validatePassword);
+  } = useInput(url, "password");
 
   const { onPassPasswordData: passPasswordData } = props;
 
   useEffect(() => {
-    passPasswordData(passwordInputValue, passwordIsValid, passwordReset, passwordInputIsInvalid);
+    passPasswordData(
+      passwordInputValue,
+      passwordReset,
+      passwordInputIsValid
+    );
   }, [
     passPasswordData,
     passwordInputValue,
-    passwordIsValid,
     passwordReset,
-    passwordInputIsInvalid,
+    passwordInputIsValid,
   ]);
-  
-  const passwordInputClasses = passwordInputIsInvalid
-    ? `${classes["form-control"]} ${classes.invalid}`
+
+  const passwordInputClasses = !passwordInputIsValid && passwordIsTouched
+    ? `${classes["form-control"]} ${classes.Valid}`
     : classes["form-control"];
 
   return (
@@ -48,32 +46,19 @@ const Password = (props) => {
         value={passwordInputValue}
         placeholder="Password"
       />
-      {!passwordDeFocused && passwordIsTouched && passwordInputIsInvalid && (
-        <p className={classes["info-text"]}>
-          Password must be of 8 character should include special character(i.e
-          @/#/$/% etc.), a-z, A-Z and 0-9.{" "}
-          <strong>
-            <em>i.e Example@1234</em>
-          </strong>
-        </p>
+      {passwordErrorResponse && !passwordDeFocused && (
+        <p className={classes["info-text"]}>{passwordErrorResponse}</p>
       )}
-      {passwordDeFocused && passwordIsTouched && passwordInputIsInvalid && (
-        <p className={classes["error-text"]}>
-          Password must be of 8 character should include special character(i.e
-          @/#/$/% etc.), a-z, A-Z and 0-9.{" "}
-          <strong>
-            <em>i.e Example@1234</em>
-          </strong>
-        </p>
+      {passwordErrorResponse && passwordDeFocused && (
+        <p className={classes["error-text"]}>{passwordErrorResponse}</p>
       )}
-      {!passwordInputIsInvalid &&
-        passwordIsTouched &&
-        passwordLength >= 8 &&
-        passwordLength <= 9 && (
-          <p className={classes["valid-text"]}>Strong password</p>
+      {!passwordErrorResponse &&
+        passwordDeFocused &&
+        passwordInputValue.trim().length === 0 && (
+          <p className={classes["error-text"]}>Password can not be blank</p>
         )}
-      {!passwordInputIsInvalid && passwordIsTouched && passwordLength >= 10 && (
-        <p className={classes["valid-text"]}>Very strong password</p>
+      {passwordInputIsValid && (
+        <p className={classes["valid-text"]}>Password is available</p>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 import os
 import re
 import secrets
+from typing_extensions import ParamSpecKwargs
 import jwt
 import datetime
 from PIL import Image
@@ -156,35 +157,46 @@ def resource_not_found(e):
 @app.route('/add_user', methods=['POST'])
 def add_user():
     user = request.get_json()
+    if user['type'] == "username":
+        username = user['inputValue']
+        # remove backslash(/) from start and end when copy regex from javascript
+        # username_validation = r"^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$"
+        username_validation = r"^[a-zA-Z0-9]+$" 
+        user_match = re.match(username_validation, username)
+        if user_match is None:
+            return jsonify({'message': 'Please enter valid username between 8 to 20 characters long. i.e example123'}), 401
+        elif len(username) < 8:
+            return jsonify({'message': 'Username should be at least 8 characters long'}), 401
+        elif len(username) > 20:
+            return jsonify({'message': 'Username should be at most 20 characters long'}), 401
+        else:
+            username_exist = User.query.filter_by(username=username).first()
+            if username_exist:
+                return jsonify({'message': 'Username is already taken. Please enter the other value'}), 401
+            return jsonify({'message': 'Username is available'}), 201
 
-    username_and_email_exist = User.query.filter_by(username=user["username"], email=user['email']).first()
-    if username_and_email_exist:
-        abort(404, description="Username and email are already taken.Please enter another values")
-    
-    username_exist = User.query.filter_by(username=user["username"]).first()
-    if username_exist:
-        abort(404, description="Username is already taken.Please enter another values")
 
-    email_exist = User.query.filter_by(email=user["email"]).first()
-    if email_exist:
-        abort(404, description="Email is already taken.Please enter another values")
+    elif user['type'] == "email":
+        email = user['inputValue']
+        email_validation = r'^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+        email_match = re.match(email_validation, email)
+        if email_match is None:
+            return jsonify({'message': "Please enter valid email. i.e example@demo.com"}), 401
 
-    # remove backslash(/) from start and end when copy regex from javascript
-    # username_validation = r"^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$"
-    username_validation = r"^[a-zA-Z0-9]+$" 
-    user_match = re.match(username_validation, user["username"])
-    if user_match is None:
-        abort(404, description="Please enter valid username of minimum 8 characters")
+        email_exist = User.query.filter_by(email=email).first()
+        if email_exist:
+            return jsonify({"message": "Email is already taken.Please enter another values"}), 401
+        return jsonify({'message': 'Email is available'}), 201
+        
+    elif user['type'] == "password":
+        password = user["inputValue"]
+        password_validation = r'^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$'
+        password_match = re.match(password_validation, password)
+        if password_match is None:
+            return jsonify({"message": """Password must be of 8 character should include special character(i.e
+          @/#/$/% etc.), a-z, A-Z and 0-9. i.e Example@1234"""}), 401
+        return jsonify({'message': 'Password is available'}), 201
 
-    email_validation = r'^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
-    email_match = re.match(email_validation, user["email"])
-    if email_match is None:
-        abort(404, description="Please enter valid email. i.e example@demo.com")
-
-    password_validation = r'^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$'
-    password_match = re.match(password_validation, user["password"])
-    if password_match is None:
-        abort(404, description="Please enter valid password. i.e Example@1234")
 
     hashed_pw = bcrypt.generate_password_hash(user["password"]).decode('utf-8')
 
@@ -210,7 +222,7 @@ def login_user():
         return jsonify({"message": 'Password is incorrect'}), 401
 
 
-    token = jwt.encode({'user_id' : user.id, 
+    token = jwt.encode({'email' : user.email, 
                             'exp' : datetime.datetime.utcnow() + 
                             datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm="HS256")
     return jsonify({'token': token})
@@ -229,7 +241,7 @@ def login_required(f):
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = User.query.filter_by(id=data['user_id']).first()
+            current_user = User.query.filter_by(email=data['email']).first()
         except:
             return jsonify({'message' : 'Token is invalid!'}), 401
 
@@ -241,5 +253,6 @@ def login_required(f):
 @app.route('/about_page')
 @login_required
 def about_page(current_user):
-    
-    return jsonify({'message': 'This is about root'}), 201
+    username = current_user.username
+    email = current_user.email
+    return jsonify({'username':username, "email":email}), 201

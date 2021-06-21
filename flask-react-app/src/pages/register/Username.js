@@ -1,47 +1,33 @@
-import { useEffect } from "react";
-import useInput from '../../hooks/use-input';
+import { useCallback, useEffect, useState } from "react";
+import useInput from "../../hooks/use-input";
 import classes from "./Username.module.css";
 
 const Username = (props) => {
-  let userNotExist = true;
-  let username_length = 0;
-  const validateName = (value) => {
-    const re = /^[a-zA-Z0-9]+$/;
-    for (const user in props.currenteUsers) {
-      if (props.currenteUsers[user].username === value) {
-        userNotExist = false;
-      }
-    }
-    username_length = value.trim().length;
-    return re.test(value) && userNotExist && username_length > 7;
-  };
-
+  const url = "/add_user";
   const {
     enteredValue: nameInputValue,
-    // isTouched: nameIsTouched,
+    isTouched: nameIsTouched,
     deFocused: nameDeFocused,
-    valueIsValid: nameIsValid,
-    inputIsInvalid: nameInputIsInvalid,
+    errorResponse: nameErrorResponse,
+    inputIsValid: nameInputIsValid,
     inputChangeHandler: nameChangeHandler,
     inputBlurHandler: nameBlurHandler,
     reset: nameReset,
-  } = useInput(validateName);
+  } = useInput(url, "username");
 
   const { onPassNameData: passNameData } = props;
 
   useEffect(() => {
-    passNameData(nameInputValue, nameIsValid, nameReset, nameInputIsInvalid);
-  }, [
-    passNameData,
-    nameInputValue,
-    nameIsValid,
-    nameReset,
-    nameInputIsInvalid,
-  ]);
+    if (!nameInputIsValid) {
+      return;
+    }
+    passNameData(nameInputValue, nameReset, nameInputIsValid);
+  }, [passNameData, nameInputValue, nameReset, nameInputIsValid]);
 
-  const nameInputClasses = nameInputIsInvalid
-    ? `${classes["form-control"]} ${classes.invalid}`
-    : classes["form-control"];
+  const nameInputClasses =
+    !nameInputIsValid && nameIsTouched 
+      ? `${classes["form-control"]} ${classes.invalid}`
+      : classes["form-control"];
 
   return (
     <div className={nameInputClasses}>
@@ -54,27 +40,18 @@ const Username = (props) => {
         value={nameInputValue}
         placeholder="Username"
       />
-      {!nameDeFocused && username_length <= 7 && username_length > 0 && (
-        <p className={classes["info-text"]}>
-          Username should be atleast six character long
-        </p>
+      {nameErrorResponse && !nameDeFocused && (
+        <p className={classes["info-text"]}>{nameErrorResponse}</p>
       )}
-      {nameDeFocused && username_length <= 7 && username_length > 0 && (
-        <p className={classes["error-text"]}>
-          Username should be atleast six character long
-        </p>
+      {nameErrorResponse && nameDeFocused && (
+        <p className={classes["error-text"]}>{nameErrorResponse}</p>
       )}
-      {nameInputIsInvalid && userNotExist && username_length === 0 && (
-        <p className={classes["error-text"]}>
-          Username can not be blank. Please enter some text
-        </p>
-      )}
-      {nameInputIsInvalid && !userNotExist && username_length > 7 && (
-        <p className={classes["error-text"]}>
-          Username is not availabel.Please enter some other value
-        </p>
-      )}
-      {!nameInputIsInvalid && username_length > 7 && (
+      {!nameErrorResponse &&
+        nameDeFocused &&
+        nameInputValue.trim().length === 0 && (
+          <p className={classes["error-text"]}>Usename can not be blank</p>
+        )}
+      {nameInputIsValid && (
         <p className={classes["valid-text"]}>Username is available</p>
       )}
     </div>

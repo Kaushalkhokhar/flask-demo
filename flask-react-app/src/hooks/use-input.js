@@ -1,41 +1,65 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import useSendInput from "./use-sendInput";
 
-const useInput = (validate) => {
+const useInput = (url, inputType, validateConfPassword=null) => {
   const [enteredValue, setEnteredValue] = useState("");
   const [isTouched, setIsTouched] = useState(false);
   const [deFocused, setDeFocused] = useState(false);
+  const {inputIsValid, errorResponse, sendInput, setValidation} = useSendInput(enteredValue, url, inputType)
+  // const [inputIsValid, setInputIsValid] = useState(false);
+  // const [errorResponse, setErrorResponse] = useState(false);
 
-  const valueIsValid = validate(enteredValue);
-  const inputIsInvalid = !valueIsValid && isTouched;
-  
+  useEffect(() => {
+    if (!isTouched) {
+      console.log("is touched runnnig...");
+      return;
+    }
+
+    const identifier = setTimeout(()=>{
+      console.log("use-input running...");
+
+      if (inputType === "confirmPassword") {
+        const validationFlag = validateConfPassword(enteredValue)
+        setValidation(validationFlag)
+      }
+      else {
+        sendInput();
+      }
+    },500)
+
+    return () => {
+      clearTimeout(identifier)
+    }
+  }, [enteredValue, isTouched, sendInput, setValidation, validateConfPassword]);
+
   const inputChangeHandler = (event) => {
     setEnteredValue(event.target.value);
-    setIsTouched(true) // this is for validation on every key stroke
+    setIsTouched(true); // this is for validation on every key stroke
     // if we want on blur only this can be removed
-    setDeFocused(false)
+    setDeFocused(false);
   };
 
   //  this can be added if we want to check validation on blur
   const inputBlurHandler = () => {
     setIsTouched(true);
-    setDeFocused(true)
+    setDeFocused(true);
   };
 
   const reset = useCallback(() => {
-    setEnteredValue('')
-    setIsTouched(false)
-  },[])
+    setEnteredValue("");
+    setIsTouched(false);
+  }, []);
 
   return {
-      enteredValue,
-      isTouched,
-      deFocused,
-      valueIsValid,
-      inputIsInvalid,
-      inputChangeHandler,
-      inputBlurHandler,
-      reset,
-  }
+    enteredValue,
+    isTouched,
+    deFocused,
+    inputIsValid,
+    errorResponse,
+    inputChangeHandler,
+    inputBlurHandler,
+    reset,
+  };
 };
 
 export default useInput;

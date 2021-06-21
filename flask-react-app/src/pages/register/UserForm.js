@@ -9,36 +9,36 @@ import ConfPassword from "./ConfPassword";
 import classes from "./UserForm.module.css";
 
 const UserForm = (props) => {
-  const [currenteUsers, setCurrentUsers] = useState([]);
+  // const [currenteUsers, setCurrentUsers] = useState([]);
   const [usernameData, setUsernameData] = useState({});
   const [emailData, setEmailData] = useState({});
   const [passwordData, setPasswordData] = useState({});
   const [confPasswordData, setConfPasswordData] = useState({});
 
-  const { users } = props;
-  useEffect(() => {
-    setCurrentUsers(users);
-  }, [users]);
+  // const { users } = props;
+  // useEffect(() => {
+  //   setCurrentUsers(users);
+  // }, [users]);
 
   const passNameData = useCallback(
-    (nameInputValue, nameIsValid, nameReset, nameInputIsInvalid) => {
+    (nameInputValue, nameReset, nameInputIsValid) => {
       setUsernameData({
         nameInputValue,
-        nameIsValid,
+        // nameIsValid,
         nameReset,
-        nameInputIsInvalid,
+        nameInputIsValid,
       });
     },
     []
   );
 
   const passEmailData = useCallback(
-    (emailInputValue, emailIsValid, emailReset, emailInputIsInvalid) => {
+    (emailInputValue, emailReset, emailInputIsValid) => {
       setEmailData({
         emailInputValue,
-        emailIsValid,
+        // emailIsValid,
         emailReset,
-        emailInputIsInvalid,
+        emailInputIsValid,
       });
     },
     []
@@ -47,15 +47,15 @@ const UserForm = (props) => {
   const passPasswordData = useCallback(
     (
       passwordInputValue,
-      passwordIsValid,
+      // passwordIsValid,
       passwordReset,
-      passwordInputIsInvalid
+      passwordInputIsValid
     ) => {
       setPasswordData({
         passwordInputValue,
-        passwordIsValid,
+        // passwordIsValid,
         passwordReset,
-        passwordInputIsInvalid,
+        passwordInputIsValid,
       });
     },
     []
@@ -64,15 +64,15 @@ const UserForm = (props) => {
   const passConfPasswordData = useCallback(
     (
       confPasswordInputValue,
-      confPasswordIsValid,
+      // confPasswordIsValid,
       confPasswordReset,
-      confPasswordInputIsInvalid
+      confPasswordInputIsValid
     ) => {
       setConfPasswordData({
         confPasswordInputValue,
-        confPasswordIsValid,
+        // confPasswordIsValid,
         confPasswordReset,
-        confPasswordInputIsInvalid,
+        confPasswordInputIsValid,
       });
     },
     []
@@ -81,25 +81,28 @@ const UserForm = (props) => {
   let formIsValid = false;
 
   if (
-    usernameData.nameIsValid &&
-    emailData.emailIsValid &&
-    passwordData.passwordIsValid &&
-    confPasswordData.confPasswordIsValid
+    usernameData.nameInputIsValid &&
+    emailData.emailInputIsValid &&
+    passwordData.passwordInputIsValid &&
+    confPasswordData.confPasswordInputIsValid
   ) {
     formIsValid = true;
   }
 
+  console.log(formIsValid);
+
   const onSubmitHandler = (event) => {
     event.preventDefault();
 
-    if (
-      usernameData.nameInputIsInvalid ||
-      emailData.emailInputIsInvalid ||
-      passwordData.passwordInputIsInvalid ||
-      confPasswordData.confPasswordInputIsInvalid
-    ) {
-      return;
-    }
+    //  This needs only if we not disable submit button
+    // if (
+    //   !usernameData.nameInputIsValid ||
+    //   !emailData.emailInputIsValid ||
+    //   !passwordData.passwordInputIsValid ||
+    //   !confPasswordData.confPasswordInputIsValid
+    // ) {
+    //   return;
+    // }
 
     const new_user = {
       username: usernameData.nameInputValue,
@@ -120,8 +123,8 @@ const UserForm = (props) => {
   return (
     <Card className={classes.form}>
       <form onSubmit={onSubmitHandler}>
-        <Username onPassNameData={passNameData} currenteUsers={currenteUsers} />
-        <Email onPassEmailData={passEmailData} currenteUsers={currenteUsers} />
+        <Username onPassNameData={passNameData} />
+        <Email onPassEmailData={passEmailData} />
         <Password onPassPasswordData={passPasswordData} />
         <ConfPassword
           onPassConfPasswordData={passConfPasswordData}
