@@ -21,18 +21,8 @@ const ConfPassword = (props) => {
   const { onPassConfPasswordData: passConfPasswordData } = props;
 
   useEffect(() => {
-    passConfPasswordData(
-      confPasswordInputValue,
-      confPasswordReset,
-      confPasswordInputIsValid
-    );
-  }, [
-    passConfPasswordData,
-    confPasswordInputValue,
-    confPasswordReset,
-    confPasswordInputIsValid,
-  ]);
-
+    passConfPasswordData(confPasswordReset, confPasswordInputIsValid);
+  }, [passConfPasswordData, confPasswordReset, confPasswordInputIsValid]);
 
   const confPasswordInputClasses =
     !confPasswordInputIsValid && confPasswordIsTouched

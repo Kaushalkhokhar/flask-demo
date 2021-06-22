@@ -153,11 +153,32 @@ def get_users():
 def resource_not_found(e):
     return jsonify(error=str(e)), 404
 
+validated_form_fields = {"added_all": False}
+def add_validated_fields(key, value, all_added=False):
+    validated_form_fields[key]= value 
+    if all_added and validated_form_fields.get("username") and validated_form_fields.get("email"):
+        validated_form_fields['added_all'] = True
+
+
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
+    
     user = request.get_json()
-    if user['type'] == "username":
+    if validated_form_fields['added_all'] and user['type'] == 'submit' :
+        hashed_pw = bcrypt.generate_password_hash(validated_form_fields['password']).decode('utf-8')
+
+        new_user = User(username=validated_form_fields['username'], email=validated_form_fields['email'], password=hashed_pw)
+        db.session.add(new_user)
+        db.session.commit()
+        validated_form_fields.pop("username")
+        validated_form_fields.pop("email")
+        validated_form_fields.pop("password")
+        validated_form_fields["added_all"] = False
+
+        return jsonify({"message": "You have registered successfully"}), 201
+
+    elif user['type'] == "username":
         username = user['inputValue']
         # remove backslash(/) from start and end when copy regex from javascript
         # username_validation = r"^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$"
@@ -173,6 +194,7 @@ def add_user():
             username_exist = User.query.filter_by(username=username).first()
             if username_exist:
                 return jsonify({'message': 'Username is already taken. Please enter the other value'}), 401
+            add_validated_fields("username", username)
             return jsonify({'message': 'Username is available'}), 201
 
 
@@ -186,6 +208,7 @@ def add_user():
         email_exist = User.query.filter_by(email=email).first()
         if email_exist:
             return jsonify({"message": "Email is already taken.Please enter another values"}), 401
+        add_validated_fields('email', email)
         return jsonify({'message': 'Email is available'}), 201
         
     elif user['type'] == "password":
@@ -195,14 +218,8 @@ def add_user():
         if password_match is None:
             return jsonify({"message": """Password must be of 8 character should include special character(i.e
           @/#/$/% etc.), a-z, A-Z and 0-9. i.e Example@1234"""}), 401
+        add_validated_fields("password", password, all_added=True)
         return jsonify({'message': 'Password is available'}), 201
-
-
-    hashed_pw = bcrypt.generate_password_hash(user["password"]).decode('utf-8')
-
-    new_user = User(username=user["username"], email=user["email"], password=hashed_pw)
-    db.session.add(new_user)
-    db.session.commit()
 
     return 'Done', 201 
 

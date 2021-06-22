@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import { Route } from "react-router-dom";
 import MainHeader from "./components/layout/MainHeader";
 import Login from "./pages/login/Login";
@@ -36,18 +36,17 @@ function App() {
   }, []);
 
   const users_list = (
-    <Fragment>
+    <div>
       {!isLoading && !error && users.length === 0 && <p>No users are added</p>}
       {!isLoading && !error && users.length > 0 && <Users users={users} />}
       {isLoading && !error && <LoadingSpinner />}
       {!isLoading && error && <p>{error}</p>}
-    </Fragment>
+    </div>
   );
 
   return (
     <div>
       <MainHeader />
-      {/* {users_list} */}
       <Route path="/login">
         <Login />
       </Route>
@@ -55,7 +54,8 @@ function App() {
         <About />
       </Route>
       <Route path="/add_user">
-        <AddUser users={users} onGetUser={getUser} />
+        <AddUser users={users} />
+        {users_list}
       </Route>
     </div>
   );

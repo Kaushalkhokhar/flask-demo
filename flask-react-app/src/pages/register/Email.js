@@ -19,13 +19,13 @@ const Email = (props) => {
 
   useEffect(() => {
     passEmailData(
-      emailInputValue,
+      
       emailReset,
       emailInputIsValid
     );
   }, [
     passEmailData,
-    emailInputValue,
+    
     emailReset,
     emailInputIsValid,
   ]);

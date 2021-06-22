@@ -5,7 +5,7 @@ const useInput = (url, inputType, validateConfPassword=null) => {
   const [enteredValue, setEnteredValue] = useState("");
   const [isTouched, setIsTouched] = useState(false);
   const [deFocused, setDeFocused] = useState(false);
-  const {inputIsValid, errorResponse, sendInput, setValidation} = useSendInput(enteredValue, url, inputType)
+  const {inputIsValid, errorResponse, sendInput, setValidation, resetState} = useSendInput(url, inputType, enteredValue)
   // const [inputIsValid, setInputIsValid] = useState(false);
   // const [errorResponse, setErrorResponse] = useState(false);
 
@@ -30,7 +30,7 @@ const useInput = (url, inputType, validateConfPassword=null) => {
     return () => {
       clearTimeout(identifier)
     }
-  }, [enteredValue, isTouched, sendInput, setValidation, validateConfPassword]);
+  }, [enteredValue, isTouched, sendInput, setValidation, inputType, validateConfPassword]);
 
   const inputChangeHandler = (event) => {
     setEnteredValue(event.target.value);
@@ -48,7 +48,9 @@ const useInput = (url, inputType, validateConfPassword=null) => {
   const reset = useCallback(() => {
     setEnteredValue("");
     setIsTouched(false);
-  }, []);
+    setDeFocused(false)
+    resetState()
+  }, [resetState]);
 
   return {
     enteredValue,

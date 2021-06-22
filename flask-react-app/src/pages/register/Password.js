@@ -3,8 +3,7 @@ import useInput from "../../hooks/use-input";
 import classes from "./Password.module.css";
 
 const Password = (props) => {
-  
-  const url = '/add_user'
+  const url = "/add_user";
   const {
     enteredValue: passwordInputValue,
     isTouched: passwordIsTouched,
@@ -19,21 +18,13 @@ const Password = (props) => {
   const { onPassPasswordData: passPasswordData } = props;
 
   useEffect(() => {
-    passPasswordData(
-      passwordInputValue,
-      passwordReset,
-      passwordInputIsValid
-    );
-  }, [
-    passPasswordData,
-    passwordInputValue,
-    passwordReset,
-    passwordInputIsValid,
-  ]);
+    passPasswordData(passwordInputValue, passwordReset, passwordInputIsValid);
+  }, [passPasswordData, passwordInputValue, passwordReset, passwordInputIsValid]);
 
-  const passwordInputClasses = !passwordInputIsValid && passwordIsTouched
-    ? `${classes["form-control"]} ${classes.Valid}`
-    : classes["form-control"];
+  const passwordInputClasses =
+    !passwordInputIsValid && passwordIsTouched
+      ? `${classes["form-control"]} ${classes.Valid}`
+      : classes["form-control"];
 
   return (
     <div className={passwordInputClasses}>

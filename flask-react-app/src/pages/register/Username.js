@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import useInput from "../../hooks/use-input";
 import classes from "./Username.module.css";
 
@@ -21,8 +21,8 @@ const Username = (props) => {
     if (!nameInputIsValid) {
       return;
     }
-    passNameData(nameInputValue, nameReset, nameInputIsValid);
-  }, [passNameData, nameInputValue, nameReset, nameInputIsValid]);
+    passNameData(nameReset, nameInputIsValid);
+  }, [passNameData, nameReset, nameInputIsValid]);
 
   const nameInputClasses =
     !nameInputIsValid && nameIsTouched 

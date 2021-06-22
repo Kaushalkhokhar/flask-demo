@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-const useSendInput = (enteredValue, url, inputType) => {
+const useSendInput = (url, inputType, enteredValue=null) => {
   const [inputIsValid, setInputIsValid] = useState(false);
   const [errorResponse, setErrorResponse] = useState(false);
 
@@ -35,11 +35,17 @@ const useSendInput = (enteredValue, url, inputType) => {
       setInputIsValid(validation)
   },[])
 
+  const resetState = useCallback(() => {
+    setInputIsValid(false)
+    setErrorResponse(false)
+  },[])
+
   return {
     inputIsValid,
     errorResponse,
     sendInput,
     setValidation,
+    resetState,
   };
 };
 

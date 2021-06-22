@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Card from "../../UI/Card";
 import Button from "../../UI/Button";
 import Username from "./Username";
@@ -9,51 +9,29 @@ import ConfPassword from "./ConfPassword";
 import classes from "./UserForm.module.css";
 
 const UserForm = (props) => {
-  // const [currenteUsers, setCurrentUsers] = useState([]);
   const [usernameData, setUsernameData] = useState({});
   const [emailData, setEmailData] = useState({});
   const [passwordData, setPasswordData] = useState({});
   const [confPasswordData, setConfPasswordData] = useState({});
 
-  // const { users } = props;
-  // useEffect(() => {
-  //   setCurrentUsers(users);
-  // }, [users]);
+  const passNameData = useCallback((nameReset, nameInputIsValid) => {
+    setUsernameData({
+      nameReset,
+      nameInputIsValid,
+    });
+  }, []);
 
-  const passNameData = useCallback(
-    (nameInputValue, nameReset, nameInputIsValid) => {
-      setUsernameData({
-        nameInputValue,
-        // nameIsValid,
-        nameReset,
-        nameInputIsValid,
-      });
-    },
-    []
-  );
-
-  const passEmailData = useCallback(
-    (emailInputValue, emailReset, emailInputIsValid) => {
-      setEmailData({
-        emailInputValue,
-        // emailIsValid,
-        emailReset,
-        emailInputIsValid,
-      });
-    },
-    []
-  );
+  const passEmailData = useCallback((emailReset, emailInputIsValid) => {
+    setEmailData({
+      emailReset,
+      emailInputIsValid,
+    });
+  }, []);
 
   const passPasswordData = useCallback(
-    (
-      passwordInputValue,
-      // passwordIsValid,
-      passwordReset,
-      passwordInputIsValid
-    ) => {
+    (passwordInputValue, passwordReset, passwordInputIsValid) => {
       setPasswordData({
         passwordInputValue,
-        // passwordIsValid,
         passwordReset,
         passwordInputIsValid,
       });
@@ -62,15 +40,8 @@ const UserForm = (props) => {
   );
 
   const passConfPasswordData = useCallback(
-    (
-      confPasswordInputValue,
-      // confPasswordIsValid,
-      confPasswordReset,
-      confPasswordInputIsValid
-    ) => {
+    (confPasswordReset, confPasswordInputIsValid) => {
       setConfPasswordData({
-        confPasswordInputValue,
-        // confPasswordIsValid,
         confPasswordReset,
         confPasswordInputIsValid,
       });
@@ -104,12 +75,6 @@ const UserForm = (props) => {
     //   return;
     // }
 
-    const new_user = {
-      username: usernameData.nameInputValue,
-      email: emailData.emailInputValue,
-      password: passwordData.passwordInputValue,
-    };
-
     const resetAll = () => {
       usernameData.nameReset();
       emailData.emailReset();
@@ -117,7 +82,7 @@ const UserForm = (props) => {
       confPasswordData.confPasswordReset();
     };
 
-    props.onAddUser(new_user, resetAll);
+    props.onAddUser(resetAll);
   };
 
   return (
