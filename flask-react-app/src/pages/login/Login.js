@@ -1,57 +1,43 @@
-import { useState, useContext } from "react";
+import { useContext, useEffect, Fragment } from "react";
 import useInput from "../../hooks/use-input";
 import AuthContext from "../../store/auth-context";
 import Card from "../../UI/Card";
 import Button from "../../UI/Button";
+import Modal from "../../UI/Modal";
 
+import useSendInput from "../../hooks/use-sendInput";
 import classes from "./Login.module.css";
 
 const Login = () => {
-  const [error, setError] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const ctx = useContext(AuthContext);
-
-  //   let emailNotExist = true;
-  const validateEmail = (value) => {
-    const re =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    // for (const user in props.currenteUsers) {
-    //   if (props.currenteUsers[user].email === value) {
-    //     emailNotExist = false;
-    //   }
-    // }
-    // return re.test(value) && emailNotExist;
-    return re.test(value);
-  };
+  const url = "/login_user";
+  const {
+    errorResponse: error,
+    inputIsValid: isSuccess,
+    successResponse,
+    sendInput,
+    resetState,
+  } = useSendInput(url, "submit");
 
   const {
     enteredValue: emailValue,
-    isTouched: emailIsTouched,
     deFocused: emailDeFocused,
-    valueIsValid: emailValueIsValid,
-    inputIsInvalid: emailInputIsInvalid,
+    inputIsValid: emailValueIsValid,
+    errorResponse: emailErrorResponse,
     inputChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHandler,
     reset: emailReset,
-  } = useInput(validateEmail);
-
-  let passwordLength = 0;
-  const validatePassword = (value) => {
-    const re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-    passwordLength = value.trim().length;
-    return re.test(value) && passwordLength >= 8;
-  };
+  } = useInput(url, "email");
 
   const {
     enteredValue: passwordValue,
-    isTouched: passwordIsTouched,
     deFocused: passwordDeFocused,
-    valueIsValid: passwordValueIsValid,
-    inputIsInvalid: passwordInputIsInvalid,
+    inputIsValid: passwordValueIsValid,
+    errorResponse: passwordErrorResponse,
     inputChangeHandler: passwordChangeHandler,
     inputBlurHandler: passwordBlurHandler,
     reset: passwordReset,
-  } = useInput(validatePassword);
+  } = useInput(url, "password");
 
   let formIsValid = false;
 
@@ -59,51 +45,36 @@ const Login = () => {
     formIsValid = true;
   }
 
-  const sendFormData = async (data) => {
-    setError(false);
-    setIsSuccess(false);
-    try {
-      const response = await fetch("/login_user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-      const token = await response.json();
-    //   console.log(token);
-      ctx.tokenHandler(token.token);
-      localStorage.setItem("token", token.token)
-      emailReset();
-      passwordReset();
-      setIsSuccess(true);
-    } catch (err) {
-      setError(err.message);
+  const { tokenHandler, token } = ctx 
+  useEffect(()=>{
+    if (token) {
+      return
     }
-  };
+    tokenHandler(successResponse.payload)
+  },[successResponse, tokenHandler, token])
 
   const submitHandler = (event) => {
     event.preventDefault();
 
-    if (!emailValueIsValid || passwordInputIsInvalid) {
-      return;
+    // This need only when we don't disable submit button
+    // if (!emailValueIsValid || !passwordInputIsValid) {
+    //   return;
+    // }
+
+    sendInput();
+    if(!error) {
+      emailReset()
+      passwordReset()
     }
-    const formData = {
-      email: emailValue,
-      password: passwordValue,
-    };
-    sendFormData(formData);
   };
 
+  const modalClickHandler = () => {
+    resetState()
+  }
+  
   return (
+    <Fragment>
     <Card className={classes.form}>
-      {isSuccess && <p>You are now logged in...</p>}
-      {error && <p>{error}</p>}
       <form onSubmit={submitHandler}>
         <div className={classes["form-control"]}>
           <label htmlFor="email">Enter Email</label>
@@ -115,6 +86,12 @@ const Login = () => {
             value={emailValue}
             placeholder="Your Email"
           />
+          {emailErrorResponse && !emailDeFocused && (
+            <p className={classes["info-text"]}>{emailErrorResponse}</p>
+          )}
+          {emailErrorResponse && emailDeFocused && (
+            <p className={classes["error-text"]}>{emailErrorResponse}</p>
+          )}
         </div>
         <div className={classes["form-control"]}>
           <label htmlFor="password">Enter password</label>
@@ -126,12 +103,26 @@ const Login = () => {
             value={passwordValue}
             placeholder="Your Password"
           />
+          {passwordErrorResponse && !passwordDeFocused && (
+            <p className={classes["info-text"]}>{passwordErrorResponse}</p>
+          )}
+          {passwordErrorResponse && passwordDeFocused && (
+            <p className={classes["error-text"]}>{passwordErrorResponse}</p>
+          )}
         </div>
         <Button type="submit" disabled={!formIsValid}>
           Login
         </Button>
       </form>
     </Card>
+    {isSuccess && (
+      <Modal
+        onClick={modalClickHandler}
+        title={"Success Message"}
+        content={successResponse.message}
+      />
+    )}
+    </Fragment>
   );
 };
 

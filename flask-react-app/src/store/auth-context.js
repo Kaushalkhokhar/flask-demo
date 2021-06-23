@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 
 const AuthContext = React.createContext({
-  token: "",
+  token: false,
   tokenHandler: (token) => {},
 });
 
 export const AuthContextProvider = (props) => {
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState(false);
   const setTokenHandler = (token) => {
-    console.log(token);
-    console.log('running');
     setToken(token);
   };
   return (

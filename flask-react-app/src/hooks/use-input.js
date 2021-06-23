@@ -11,12 +11,10 @@ const useInput = (url, inputType, validateConfPassword=null) => {
 
   useEffect(() => {
     if (!isTouched) {
-      console.log("is touched runnnig...");
       return;
     }
 
     const identifier = setTimeout(()=>{
-      console.log("use-input running...");
 
       if (inputType === "confirmPassword") {
         const validationFlag = validateConfPassword(enteredValue)

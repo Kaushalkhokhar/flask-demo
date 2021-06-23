@@ -18,9 +18,6 @@ const Username = (props) => {
   const { onPassNameData: passNameData } = props;
 
   useEffect(() => {
-    if (!nameInputIsValid) {
-      return;
-    }
     passNameData(nameReset, nameInputIsValid);
   }, [passNameData, nameReset, nameInputIsValid]);
 

@@ -1,40 +1,39 @@
-import { Fragment, useState, useContext, useEffect, useCallback } from "react";
+import { Fragment, useContext, useEffect } from "react";
+import useGetData from "../../hooks/use-getData";
 import AuthContext from "../../store/auth-context";
+import LoadingSpinner from "../../UI/LoadingSpinner";
+
+import Modal from "../../UI/Modal";
 
 const About = () => {
-  const [error, setError] = useState(null);
-  const [isSuccess, setIsSccess] = useState(null);
-  const ctx = useContext(AuthContext);
-  const getAbout = useCallback(async () => {
-    setError(null);
-    setIsSccess(false);
-    try {
-      const response = await fetch("/about_page", {
-        headers: {
-          "x-access-token": localStorage.getItem("token"),
-        },
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-      const data = await response.json();
-      setIsSccess({username:data.username, email:data.email});
-    } catch (err) {
-      setError(err.message);
-    }
-  }, []);
+  const ctxAuth = useContext(AuthContext)
+  const {
+    data,
+    error,
+    isLoading,
+    isSuccess,
+    resetState,
+    fetchData,} = useGetData('/about_page', ctxAuth.token)
 
   useEffect(() => {
-    getAbout();
-  }, [getAbout]);
+    fetchData();
+  }, [fetchData]);
+
+  const modalClickHandler = () => {
+    resetState()
+  }
 
   return (
     <Fragment>
-      <p>{ctx.token}</p>
-      {isSuccess && <p>{isSuccess.email}</p>}
-      {error && <p>{error}</p>}
+      {isSuccess && <p>{data.message}</p>}
+      {isLoading && <LoadingSpinner />}
+      {error && (
+      <Modal
+        onClick={modalClickHandler}
+        title={"Error Message"}
+        content={error}
+      />
+    )}
     </Fragment>
   );
 };

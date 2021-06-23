@@ -60,8 +60,6 @@ const UserForm = (props) => {
     formIsValid = true;
   }
 
-  console.log(formIsValid);
-
   const onSubmitHandler = (event) => {
     event.preventDefault();
 
