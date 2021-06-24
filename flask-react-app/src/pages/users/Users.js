@@ -5,11 +5,12 @@ import LoadingSpinner from "../../UI/LoadingSpinner";
 
 const Users = () => {
   const {
-    data: users,
+    data: usersData,
     error,
     isLoading,
+    isSuccess,
     fetchData: getUser,
-  } = useGetData("/get_users");
+  } = useGetData("/users");
 
   useEffect(() => {
     getUser();
@@ -17,8 +18,8 @@ const Users = () => {
 
   return (
     <Fragment>
-      {!isLoading && !error && users.length === 0 && <p>No users are added</p>}
-      {!isLoading && !error && users.length > 0 && <UserList users={users} />}
+      {isSuccess && usersData.payload.length === 0 && <p>No users are added</p>}
+      {isSuccess && usersData.payload.length > 0 && <UserList users={usersData.payload} />}
       {isLoading && !error && <LoadingSpinner />}
       {!isLoading && error && <p>{error}</p>}
     </Fragment>

@@ -1,55 +1,54 @@
 import { useEffect } from "react";
-import useSendData from "../../hooks/use-sendData";
 import useInput from "../../hooks/use-input";
-import classes from "./Password.module.css";
+import useSendData from "../../hooks/use-sendData"
 
-const Password = (props) => {
+import classes from "./LoginPassword.module.css";
+
+const LoginPassword = (props) => {
   const {
     enteredValue: passwordInputValue,
     isTouched: passwordIsTouched,
     deFocused: passwordDeFocused,
+    // inputIsValid: passwordValueIsValid,
+    // errorResponse: passwordErrorResponse,
     inputChangeHandler: passwordChangeHandler,
     inputBlurHandler: passwordBlurHandler,
   } = useInput();
+
   const {
     inputIsValid: passwordInputIsValid,
     errorResponse: passwordErrorResponse,
     sendInput,
   } = useSendData();
 
-  const { onPassPasswordData: passPasswordData } = props;
+  const { onPassPassword: passPasswordData } = props;
 
   useEffect(() => {
-    if (!passwordIsTouched) {
+    if(!passwordIsTouched){
       return
     }
-    const identifier = setTimeout(() => { 
-      sendInput("/register", "password", passwordInputValue);
+    const identifier = setTimeout(() => {
+      sendInput("/login", "password", passwordInputValue);
     }, 500);
-    return ()=>{
-      clearTimeout(identifier)
-    }
+    return () => {
+      clearTimeout(identifier);
+    };
   }, [passwordIsTouched, passwordInputValue, sendInput]);
 
   useEffect(()=>{
-    passPasswordData(passwordInputValue, passwordInputIsValid);
+    passPasswordData({passwordInputValue, passwordInputIsValid});
   },[passPasswordData, passwordInputValue, passwordInputIsValid])
 
-  const passwordInputClasses =
-    !passwordInputIsValid && passwordIsTouched
-      ? `${classes["form-control"]} ${classes.Valid}`
-      : classes["form-control"];
-
   return (
-    <div className={passwordInputClasses}>
-      <label htmlFor="password">Your E-mail</label>
+    <div className={classes["form-control"]}>
+      <label htmlFor="password">Enter password</label>
       <input
         type="password"
         id="password"
         onChange={passwordChangeHandler}
         onBlur={passwordBlurHandler}
         value={passwordInputValue}
-        placeholder="Password"
+        placeholder="Your Password"
       />
       {passwordErrorResponse && !passwordDeFocused && (
         <p className={classes["info-text"]}>{passwordErrorResponse}</p>
@@ -57,16 +56,8 @@ const Password = (props) => {
       {passwordErrorResponse && passwordDeFocused && (
         <p className={classes["error-text"]}>{passwordErrorResponse}</p>
       )}
-      {!passwordErrorResponse &&
-        passwordDeFocused &&
-        passwordInputValue.trim().length === 0 && (
-          <p className={classes["error-text"]}>Password can not be blank</p>
-        )}
-      {passwordInputIsValid && (
-        <p className={classes["valid-text"]}>Password is valid</p>
-      )}
     </div>
   );
 };
 
-export default Password;
+export default LoginPassword;

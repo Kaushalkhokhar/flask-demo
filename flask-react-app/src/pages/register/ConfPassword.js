@@ -3,26 +3,24 @@ import useInput from "../../hooks/use-input";
 import classes from "./ConfPassword.module.css";
 
 const ConfPassword = (props) => {
-  const validateConfPassword = (value) => {
-    const isMatched = props.passwordInputValue === value;
-    return isMatched;
-  };
-  const url = "/add_user";
   const {
     enteredValue: confPasswordInputValue,
     isTouched: confPasswordIsTouched,
     deFocused: confPasswordDeFocused,
-    inputIsValid: confPasswordInputIsValid,
     inputChangeHandler: confPasswordChangeHandler,
     inputBlurHandler: confPasswordBlurHandler,
-    reset: confPasswordReset,
-  } = useInput(url, "confirmPassword", validateConfPassword);
+  } = useInput();
 
   const { onPassConfPasswordData: passConfPasswordData } = props;
 
+  let confPasswordInputIsValid = false
+  if (props.passwordInputValue === confPasswordInputValue) {
+    confPasswordInputIsValid = true
+  }
+
   useEffect(() => {
-    passConfPasswordData(confPasswordReset, confPasswordInputIsValid);
-  }, [passConfPasswordData, confPasswordReset, confPasswordInputIsValid]);
+    passConfPasswordData(confPasswordInputIsValid);
+  }, [passConfPasswordData, confPasswordInputIsValid]);
 
   const confPasswordInputClasses =
     !confPasswordInputIsValid && confPasswordIsTouched
@@ -54,7 +52,7 @@ const ConfPassword = (props) => {
             Password and confirm password must be same
           </p>
         )}
-      {confPasswordInputIsValid && (
+      {confPasswordInputIsValid && confPasswordInputValue.trim().length > 0 &&(
         <p className={classes["valid-text"]}>
           Password and confirm password matched.
         </p>

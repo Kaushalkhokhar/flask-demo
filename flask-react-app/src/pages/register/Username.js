@@ -1,28 +1,43 @@
 import { useEffect } from "react";
 import useInput from "../../hooks/use-input";
+import useSendData from "../../hooks/use-sendData";
 import classes from "./Username.module.css";
 
 const Username = (props) => {
-  const url = "/add_user";
   const {
     enteredValue: nameInputValue,
     isTouched: nameIsTouched,
     deFocused: nameDeFocused,
-    errorResponse: nameErrorResponse,
-    inputIsValid: nameInputIsValid,
     inputChangeHandler: nameChangeHandler,
     inputBlurHandler: nameBlurHandler,
-    reset: nameReset,
-  } = useInput(url, "username");
+  } = useInput();
+
+  const {
+    inputIsValid: nameInputIsValid,
+    errorResponse: nameErrorResponse,
+    sendInput,
+  } = useSendData();
 
   const { onPassNameData: passNameData } = props;
 
   useEffect(() => {
-    passNameData(nameReset, nameInputIsValid);
-  }, [passNameData, nameReset, nameInputIsValid]);
+    if (!nameIsTouched) {
+      return
+    }
+    const identifier = setTimeout(() => {
+      sendInput("/register", "username", nameInputValue);
+    }, 500);
+    return () => {
+      clearTimeout(identifier);
+    };
+  }, [nameInputValue, nameIsTouched, sendInput]);
+
+  useEffect(()=>{
+    passNameData(nameInputValue, nameInputIsValid);
+  },[passNameData, nameInputValue, nameInputIsValid])
 
   const nameInputClasses =
-    !nameInputIsValid && nameIsTouched 
+    !nameInputIsValid && nameIsTouched
       ? `${classes["form-control"]} ${classes.invalid}`
       : classes["form-control"];
 

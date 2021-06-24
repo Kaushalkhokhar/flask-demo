@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 const AuthContext = React.createContext({
   token: false,
@@ -7,11 +7,12 @@ const AuthContext = React.createContext({
 
 export const AuthContextProvider = (props) => {
   const [token, setToken] = useState(false);
-  const setTokenHandler = (token) => {
+  const tokenHandler = useCallback((token) => {
     setToken(token);
-  };
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ token:token, tokenHandler:setTokenHandler }}>
+    <AuthContext.Provider value={{ token, tokenHandler }}>
       {props.children}
     </AuthContext.Provider>
   );

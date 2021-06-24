@@ -1,127 +1,92 @@
-import { useContext, useEffect, Fragment } from "react";
-import useInput from "../../hooks/use-input";
+import { useContext, useEffect, Fragment, useState, useCallback } from "react";
 import AuthContext from "../../store/auth-context";
 import Card from "../../UI/Card";
 import Button from "../../UI/Button";
 import Modal from "../../UI/Modal";
+import LoadingSpinner from "../../UI/LoadingSpinner";
+import LoginEmail from "./LoginEmail";
+import LoginPassword from "./LoginPassword";
 
-import useSendInput from "../../hooks/use-sendInput";
+import useSendData from "../../hooks/use-sendData";
 import classes from "./Login.module.css";
+import { useHistory } from "react-router";
 
 const Login = () => {
+  const history = useHistory()
   const ctx = useContext(AuthContext);
-  const url = "/login_user";
+  const [emailData, setEmailData] = useState({});
+  const [passwordData, setPasswordData] = useState({});
+  
   const {
     errorResponse: error,
-    inputIsValid: isSuccess,
     successResponse,
+    isLoading,
     sendInput,
     resetState,
-  } = useSendInput(url, "submit");
-
-  const {
-    enteredValue: emailValue,
-    deFocused: emailDeFocused,
-    inputIsValid: emailValueIsValid,
-    errorResponse: emailErrorResponse,
-    inputChangeHandler: emailChangeHandler,
-    inputBlurHandler: emailBlurHandler,
-    reset: emailReset,
-  } = useInput(url, "email");
-
-  const {
-    enteredValue: passwordValue,
-    deFocused: passwordDeFocused,
-    inputIsValid: passwordValueIsValid,
-    errorResponse: passwordErrorResponse,
-    inputChangeHandler: passwordChangeHandler,
-    inputBlurHandler: passwordBlurHandler,
-    reset: passwordReset,
-  } = useInput(url, "password");
-
+  } = useSendData();
+  
+  const passEmailData = useCallback((emailData) => {
+    setEmailData(emailData);
+  },[]);
+  
+  const passPasswordData = useCallback((passwordData) => {
+    setPasswordData(passwordData);
+  },[]);
+  
   let formIsValid = false;
-
-  if (emailValueIsValid && passwordValueIsValid) {
+  
+  if (emailData.emailInputIsValid && passwordData.passwordInputIsValid) {
     formIsValid = true;
   }
-
-  const { tokenHandler, token } = ctx 
-  useEffect(()=>{
+  
+  const { token, tokenHandler } = ctx;
+  useEffect(() => {
     if (token) {
-      return
+      history.push('/home')
+      return;
     }
-    tokenHandler(successResponse.payload)
-  },[successResponse, tokenHandler, token])
+    tokenHandler(successResponse.payload);
+  }, [successResponse, token, history, tokenHandler]);
 
-  const submitHandler = (event) => {
+  const submitHandler = (event) => {  
     event.preventDefault();
 
     // This need only when we don't disable submit button
     // if (!emailValueIsValid || !passwordInputIsValid) {
     //   return;
     // }
-
-    sendInput();
-    if(!error) {
-      emailReset()
-      passwordReset()
+    const userData = {
+      email: emailData.emailInputValue,
+      password: passwordData.passwordInputvalue
     }
+    sendInput('/login', "submit", userData);
   };
 
   const modalClickHandler = () => {
-    resetState()
-  }
-  
+    resetState();
+  };
+
   return (
     <Fragment>
-    <Card className={classes.form}>
-      <form onSubmit={submitHandler}>
-        <div className={classes["form-control"]}>
-          <label htmlFor="email">Enter Email</label>
-          <input
-            type="text"
-            id="email"
-            onChange={emailChangeHandler}
-            onBlur={emailBlurHandler}
-            value={emailValue}
-            placeholder="Your Email"
-          />
-          {emailErrorResponse && !emailDeFocused && (
-            <p className={classes["info-text"]}>{emailErrorResponse}</p>
-          )}
-          {emailErrorResponse && emailDeFocused && (
-            <p className={classes["error-text"]}>{emailErrorResponse}</p>
-          )}
-        </div>
-        <div className={classes["form-control"]}>
-          <label htmlFor="password">Enter password</label>
-          <input
-            type="password"
-            id="password"
-            onChange={passwordChangeHandler}
-            onBlur={passwordBlurHandler}
-            value={passwordValue}
-            placeholder="Your Password"
-          />
-          {passwordErrorResponse && !passwordDeFocused && (
-            <p className={classes["info-text"]}>{passwordErrorResponse}</p>
-          )}
-          {passwordErrorResponse && passwordDeFocused && (
-            <p className={classes["error-text"]}>{passwordErrorResponse}</p>
-          )}
-        </div>
-        <Button type="submit" disabled={!formIsValid}>
-          Login
-        </Button>
-      </form>
-    </Card>
-    {isSuccess && (
-      <Modal
-        onClick={modalClickHandler}
-        title={"Success Message"}
-        content={successResponse.message}
-      />
-    )}
+      {!isLoading && (
+        <Card className={classes.form}>
+          <form onSubmit={submitHandler}>
+            <LoginEmail onPassEmail={passEmailData} />
+            <LoginPassword onPassPassword={passPasswordData} />
+            <Button type="submit" disabled={!formIsValid}>
+              Login
+            </Button>
+          </form>
+        </Card>
+      )}
+      {isLoading && !error && <LoadingSpinner />}
+      {!isLoading && error && (
+        <Modal
+          onClick={modalClickHandler}
+          title={"Error Message"}
+          content={error}
+        />
+      )}
     </Fragment>
   );
 };

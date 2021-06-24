@@ -269,12 +269,16 @@ def login_required(f):
             token = request.headers['x-access-token']
 
         if not token:
+            #  this is for deployement pourpose
+            # return jsonify({"data": {"message": 'Login required to access this page}}), 401
             return jsonify({"data": {"message": 'Token is missing'}}), 401
 
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             current_user = User.query.filter_by(email=data['email']).first()
         except:
+            #  this is for deployement pourpose
+            # return jsonify({'data': {"message": 'Login required to access this page'}}), 401
             return jsonify({'data': {"message": 'Token is invalid!'}}), 401
 
 

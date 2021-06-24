@@ -14,25 +14,24 @@ const UserForm = (props) => {
   const [passwordData, setPasswordData] = useState({});
   const [confPasswordData, setConfPasswordData] = useState({});
 
-  const passNameData = useCallback((nameReset, nameInputIsValid) => {
+  const passNameData = useCallback((nameInputValue, nameInputIsValid) => {
     setUsernameData({
-      nameReset,
+      nameInputValue,
       nameInputIsValid,
     });
   }, []);
 
-  const passEmailData = useCallback((emailReset, emailInputIsValid) => {
+  const passEmailData = useCallback((emailInputValue, emailInputIsValid) => {
     setEmailData({
-      emailReset,
+      emailInputValue,
       emailInputIsValid,
     });
   }, []);
 
   const passPasswordData = useCallback(
-    (passwordInputValue, passwordReset, passwordInputIsValid) => {
+    (passwordInputValue, passwordInputIsValid) => {
       setPasswordData({
         passwordInputValue,
-        passwordReset,
         passwordInputIsValid,
       });
     },
@@ -40,9 +39,8 @@ const UserForm = (props) => {
   );
 
   const passConfPasswordData = useCallback(
-    (confPasswordReset, confPasswordInputIsValid) => {
+    (confPasswordInputIsValid) => {
       setConfPasswordData({
-        confPasswordReset,
         confPasswordInputIsValid,
       });
     },
@@ -73,20 +71,19 @@ const UserForm = (props) => {
     //   return;
     // }
 
-    const resetAll = () => {
-      usernameData.nameReset();
-      emailData.emailReset();
-      passwordData.passwordReset();
-      confPasswordData.confPasswordReset();
-    };
+    const newUser = {
+      username: usernameData.nameInputValue,
+      email: emailData.emailInputValue,
+      password: passwordData.passwordInputValue
+    }
 
-    props.onAddUser(resetAll);
+    props.onAddUser(newUser);
   };
 
   return (
     <Card className={classes.form}>
       <form onSubmit={onSubmitHandler}>
-        <Username onPassNameData={passNameData} />
+        <Username onPassNameData={passNameData} />  
         <Email onPassEmailData={passEmailData} />
         <Password onPassPasswordData={passPasswordData} />
         <ConfPassword

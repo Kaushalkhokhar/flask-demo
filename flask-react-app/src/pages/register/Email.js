@@ -1,38 +1,45 @@
 import { useEffect } from "react";
 import useInput from "../../hooks/use-input";
 import classes from "./Email.module.css";
+import useSendData from "../../hooks/use-sendData";
 
 const Email = (props) => {
-  const url = '/add_user'
   const {
     enteredValue: emailInputValue,
     isTouched: emailIsTouched,
     deFocused: emailDeFocused,
-    inputIsValid: emailInputIsValid,
-    errorResponse: emailErrorResponse,
     inputChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHandler,
-    reset: emailReset,
-  } = useInput(url, "email");
+  } = useInput();
+
+  const {
+    inputIsValid: emailInputIsValid,
+    errorResponse: emailErrorResponse,
+    sendInput,
+  } = useSendData();
 
   const { onPassEmailData: passEmailData } = props;
 
   useEffect(() => {
-    passEmailData(
-      
-      emailReset,
-      emailInputIsValid
-    );
-  }, [
-    passEmailData,
-    
-    emailReset,
-    emailInputIsValid,
-  ]);
+    if (!emailIsTouched) {
+      return;
+    }
+    const identifier = setTimeout(() => {
+      sendInput("/register", "email", emailInputValue);
+    }, 500);
+    return () => {
+      clearTimeout(identifier);
+    };
+  }, [emailIsTouched, emailInputValue, sendInput]);
 
-  const emailInputClasses = !emailInputIsValid && emailIsTouched
-    ? `${classes["form-control"]} ${classes.invalid}`
-    : classes["form-control"];
+  useEffect(()=>{
+    passEmailData(emailInputValue, emailInputIsValid);
+  },[passEmailData, emailInputValue, emailInputIsValid,])
+
+  const emailInputClasses =
+    !emailInputIsValid && emailIsTouched
+      ? `${classes["form-control"]} ${classes.invalid}`
+      : classes["form-control"];
 
   return (
     <div className={emailInputClasses}>

@@ -13,7 +13,7 @@ const About = () => {
     isLoading,
     isSuccess,
     resetState,
-    fetchData,} = useGetData('/about_page', ctxAuth.token)
+    fetchData,} = useGetData('/about', ctxAuth.token)
 
   useEffect(() => {
     fetchData();
