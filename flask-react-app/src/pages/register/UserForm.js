@@ -14,38 +14,23 @@ const UserForm = (props) => {
   const [passwordData, setPasswordData] = useState({});
   const [confPasswordData, setConfPasswordData] = useState({});
 
-  const passNameData = useCallback((nameInputValue, nameInputIsValid) => {
-    setUsernameData({
-      nameInputValue,
-      nameInputIsValid,
-    });
+  const url = "/register";
+
+  const passNameData = useCallback((data) => {
+    setUsernameData(data);
   }, []);
 
-  const passEmailData = useCallback((emailInputValue, emailInputIsValid) => {
-    setEmailData({
-      emailInputValue,
-      emailInputIsValid,
-    });
+  const passEmailData = useCallback((data) => {
+    setEmailData(data);
   }, []);
 
-  const passPasswordData = useCallback(
-    (passwordInputValue, passwordInputIsValid) => {
-      setPasswordData({
-        passwordInputValue,
-        passwordInputIsValid,
-      });
-    },
-    []
-  );
+  const passPasswordData = useCallback((data) => {
+    setPasswordData(data);
+  }, []);
 
-  const passConfPasswordData = useCallback(
-    (confPasswordInputIsValid) => {
-      setConfPasswordData({
-        confPasswordInputIsValid,
-      });
-    },
-    []
-  );
+  const passConfPasswordData = useCallback((data) => {
+    setConfPasswordData(data);
+  }, []);
 
   let formIsValid = false;
 
@@ -74,8 +59,8 @@ const UserForm = (props) => {
     const newUser = {
       username: usernameData.nameInputValue,
       email: emailData.emailInputValue,
-      password: passwordData.passwordInputValue
-    }
+      password: passwordData.passwordInputValue,
+    };
 
     props.onAddUser(newUser);
   };
@@ -83,9 +68,9 @@ const UserForm = (props) => {
   return (
     <Card className={classes.form}>
       <form onSubmit={onSubmitHandler}>
-        <Username onPassNameData={passNameData} />  
-        <Email onPassEmailData={passEmailData} />
-        <Password onPassPasswordData={passPasswordData} />
+        <Username onPassNameData={passNameData} url={url} />
+        <Email onPassEmailData={passEmailData} url={url} />
+        <Password onPassPasswordData={passPasswordData} url={url} />
         <ConfPassword
           onPassConfPasswordData={passConfPasswordData}
           passwordInputValue={passwordData.passwordInputValue}

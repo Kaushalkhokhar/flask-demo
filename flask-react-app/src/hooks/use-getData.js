@@ -21,15 +21,14 @@ const useGetData = (url, token = null, payload = null) => {
       if (response.status === 401) {
         const error = await response.json();
         setError(error.data.message);
-      }
-      else {
+      } else {
         setError("Something went wrong. Please try again");
       }
+    } else {
+      const success = await response.json();
+      setData(success.data);
+      setIsScuccess(true);
     }
-
-    const success = await response.json();
-    setData(success.data);
-    setIsScuccess(true);
     setIsLoading(false);
   }, [url, token]);
 

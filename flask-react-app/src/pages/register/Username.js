@@ -15,6 +15,7 @@ const Username = (props) => {
   const {
     inputIsValid: nameInputIsValid,
     errorResponse: nameErrorResponse,
+    successResponse: success,
     sendInput,
   } = useSendData();
 
@@ -25,7 +26,7 @@ const Username = (props) => {
       return
     }
     const identifier = setTimeout(() => {
-      sendInput("/register", "username", nameInputValue);
+      sendInput(props.url, "username", nameInputValue);
     }, 500);
     return () => {
       clearTimeout(identifier);
@@ -33,7 +34,7 @@ const Username = (props) => {
   }, [nameInputValue, nameIsTouched, sendInput]);
 
   useEffect(()=>{
-    passNameData(nameInputValue, nameInputIsValid);
+    passNameData({nameInputValue, nameInputIsValid});
   },[passNameData, nameInputValue, nameInputIsValid])
 
   const nameInputClasses =
@@ -58,13 +59,13 @@ const Username = (props) => {
       {nameErrorResponse && nameDeFocused && (
         <p className={classes["error-text"]}>{nameErrorResponse}</p>
       )}
-      {!nameErrorResponse &&
+      {/* {!nameErrorResponse &&
         nameDeFocused &&
         nameInputValue.trim().length === 0 && (
           <p className={classes["error-text"]}>Usename can not be blank</p>
-        )}
+        )} */}
       {nameInputIsValid && (
-        <p className={classes["valid-text"]}>Username is available</p>
+        <p className={classes["valid-text"]}>{success.message}</p>
       )}
     </div>
   );

@@ -24,7 +24,7 @@ const Password = (props) => {
       return
     }
     const identifier = setTimeout(() => { 
-      sendInput("/register", "password", passwordInputValue);
+      sendInput(props.url, "password", passwordInputValue);
     }, 500);
     return ()=>{
       clearTimeout(identifier)
@@ -32,7 +32,7 @@ const Password = (props) => {
   }, [passwordIsTouched, passwordInputValue, sendInput]);
 
   useEffect(()=>{
-    passPasswordData(passwordInputValue, passwordInputIsValid);
+    passPasswordData({passwordInputValue, passwordInputIsValid});
   },[passPasswordData, passwordInputValue, passwordInputIsValid])
 
   const passwordInputClasses =

@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import useInput from "../../hooks/use-input";
-import useSendData from "../../hooks/use-sendData"
+import useSendData from "../../hooks/use-sendData";
 
-import classes from "./LoginEmail.module.css";
+import classes from "./ResetEmail.module.css";
 
-const LoginEmail = (props) => {
+const ResetEmail = (props) => {
   const {
     enteredValue: emailInputValue,
     isTouched: emailIsTouched,
@@ -19,23 +19,23 @@ const LoginEmail = (props) => {
     sendInput,
   } = useSendData();
 
-  const { onPassEmail: passEmailData } = props;
+  const { onPassEmailData: passEmailData } = props;
 
   useEffect(() => {
-    if(!emailIsTouched) {
-      return
+    if (!emailIsTouched) {
+      return;
     }
     const identifier = setTimeout(() => {
-      sendInput("/login", "email", emailInputValue);
+      sendInput("/reset_request", "email", emailInputValue);
     }, 500);
     return () => {
       clearTimeout(identifier);
     };
   }, [emailInputValue, emailIsTouched, sendInput]);
 
-  useEffect(()=>{
-    passEmailData({emailInputValue, emailInputIsValid});
-  },[passEmailData, emailInputValue, emailInputIsValid])
+  useEffect(() => {
+    passEmailData({ emailInputValue, emailInputIsValid });
+  }, [passEmailData, emailInputValue, emailInputIsValid]);
 
   return (
     <div className={classes["form-control"]}>
@@ -58,4 +58,4 @@ const LoginEmail = (props) => {
   );
 };
 
-export default LoginEmail;
+export default ResetEmail;

@@ -108,6 +108,7 @@
 
 - sqlalchemy allows to create a database using classes also known as modal
 - For mote about sqllechemy database access use documentation
+- we do not have to do db.session.add to update the database. just directly to db.session.commit()
 
 ## Video 5 - Package Structure
 - When we access any class(i.e User, Post) from modules(i.e models) it runs whole module not only section that is imported
@@ -126,3 +127,11 @@
 - we can give extra info to url_for method by
     - i.e {{ url_for('post', post_id=post_id) }}
 
+## Video 9 - Pagination
+    - Post.query.paginate()
+        - will give an paginate object. we can use this object to set pagination and how many post should be rendered on a single page and like that
+        - we have to use post.items to access it
+        - post.iter_pages() used to set pages to be displayed
+        - Post.query.order_by() is used to set order of posts
+    - To get query parameter(?page=) of url in flask 
+        - i.e request.query.get('<name-of-parameter>', default=<default-value> , type=<type-of-parameter>)

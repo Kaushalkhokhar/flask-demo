@@ -1,4 +1,5 @@
 import { useContext, useEffect, Fragment, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import AuthContext from "../../store/auth-context";
 import Card from "../../UI/Card";
 import Button from "../../UI/Button";
@@ -25,12 +26,12 @@ const Login = () => {
     resetState,
   } = useSendData();
   
-  const passEmailData = useCallback((emailData) => {
-    setEmailData(emailData);
+  const passEmailData = useCallback((data) => {
+    setEmailData(data);
   },[]);
   
-  const passPasswordData = useCallback((passwordData) => {
-    setPasswordData(passwordData);
+  const passPasswordData = useCallback((data) => {
+    setPasswordData(data);
   },[]);
   
   let formIsValid = false;
@@ -57,7 +58,7 @@ const Login = () => {
     // }
     const userData = {
       email: emailData.emailInputValue,
-      password: passwordData.passwordInputvalue
+      password: passwordData.passwordInputValue
     }
     sendInput('/login', "submit", userData);
   };
@@ -76,6 +77,7 @@ const Login = () => {
             <Button type="submit" disabled={!formIsValid}>
               Login
             </Button>
+            <Link to="/reset_request">Forgot Password?</Link>
           </form>
         </Card>
       )}

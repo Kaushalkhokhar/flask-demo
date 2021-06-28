@@ -25,7 +25,7 @@ const Email = (props) => {
       return;
     }
     const identifier = setTimeout(() => {
-      sendInput("/register", "email", emailInputValue);
+      sendInput(props.url, "email", emailInputValue);
     }, 500);
     return () => {
       clearTimeout(identifier);
@@ -33,7 +33,7 @@ const Email = (props) => {
   }, [emailIsTouched, emailInputValue, sendInput]);
 
   useEffect(()=>{
-    passEmailData(emailInputValue, emailInputIsValid);
+    passEmailData({emailInputValue, emailInputIsValid});
   },[passEmailData, emailInputValue, emailInputIsValid,])
 
   const emailInputClasses =
