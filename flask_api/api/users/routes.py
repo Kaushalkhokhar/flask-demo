@@ -1,41 +1,17 @@
 import re
 import jwt
 import datetime
-from flask import request, jsonify, url_for
-from functools import wraps
+from flask import request, jsonify, Blueprint, current_app
 
-from jwt import algorithms
-from api import app, db, bcrypt, mail
+from api import db, bcrypt
 from api.models import User
-from flask_mail import Message
-
-def login_required(f):
-    # @wraps(f)
-    def wrapper(*args, **kwargs):
-        token = None
-
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
-
-        if not token:
-            #  this is for deployement pourpose
-            # return jsonify({"data": {"message": 'Login required to access this page}}), 401
-            return jsonify({"data": {"message": 'Token is missing'}}), 401
-
-        try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = User.query.filter_by(email=data['email']).first()
-        except:
-            #  this is for deployement pourpose
-            # return jsonify({'data': {"message": 'Login required to access this page'}}), 401
-            return jsonify({'data': {"message": 'Token is invalid!'}}), 401
+from api.users.utils import send_reset_email
 
 
-        return f(current_user, *args, **kwargs)
+users = Blueprint('example_blueprint', __name__)
 
-    return wrapper
 
-@app.route("/users")
+@users.route("/users")
 def get_users():
     users = User.query.all()
     formated_user = []
@@ -43,12 +19,7 @@ def get_users():
         formated_user.append({'username': user.username, 'email': user.email})
     return jsonify({'data': {"message": "You have successfully fetched a data", "payload": formated_user}}), 201
 
-@app.errorhandler(404)
-def resource_not_found(e):
-    return jsonify(error=str(e)), 404
-
-
-@app.route('/register', methods=['POST'])
+@users.route('/register', methods=['POST'])
 def register():
     
     user = request.get_json()
@@ -118,7 +89,7 @@ def register():
     return jsonify({'data': {"message": 'Success'}}), 201
 
 
-@app.route('/login', methods=['POST'])
+@users.route('/login', methods=['POST'])
 def login():
     user = request.get_json()
 
@@ -133,7 +104,7 @@ def login():
  
         token = jwt.encode({'email': user_data.get('email'), 
                                 'exp': datetime.datetime.utcnow() + 
-                                datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm="HS256")
+                                datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'], algorithm="HS256")
         return jsonify({'data':{"message": "You have logged in successfully", "payload": token}}), 201
 
     if not user or not user['type']:
@@ -163,33 +134,7 @@ def login():
           @/#/$/% etc.), a-z, A-Z and 0-9. i.e Example@1234"""}}), 401
         return jsonify({"data": {"message":'Valid password'}}), 201
 
-@app.route('/about')
-@login_required
-def about(current_user):
-    username = current_user.username
-    email = current_user.email
-    return jsonify({"data": {"message": "You have successfully accessed about page", 
-                            "payload": {"username":username, "email":email}}}), 201
-
-
-def send_reset_email(user):
-
-    print(app.config['MAIL_PASSWORD'])
-    token = jwt.encode({"email": user.email, 
-                            "exp": datetime.datetime.utcnow() +
-                            datetime.timedelta(minutes=5)}, app.config["SECRET_KEY"], algorithm="HS256")
-                            
-# {url_for('reset_token', token=token, _external=True)}   
-    msg = Message('Password Reset Request',
-                  sender='noreply@demo.com',
-                  recipients=[user.email])
-    msg.body = f'''To reset your password, visit the following link:
-http://localhost:3000/reset_password/{token}
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
-    mail.send(msg)
-
-@app.route('/reset_request', methods=['POST'])
+@users.route('/reset_request', methods=['POST'])
 def reset_request():
     user = request.get_json()
 
@@ -214,7 +159,7 @@ def reset_request():
 
     return jsonify({"data": {"message": "Something went wrong.Please try again"}}), 401
 
-@app.route('/reset_password', methods=['POST'])
+@users.route('/reset_password', methods=['POST'])
 def reset_password():
     user = request.get_json()
 
@@ -241,7 +186,7 @@ def reset_password():
             return jsonify({"data": {"message": 'Token is missing'}}), 401
 
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             user = User.query.filter_by(email=data['email']).first()
             hashed_password = bcrypt.generate_password_hash(userData.get('password'))
             user.password = hashed_password
@@ -253,5 +198,3 @@ def reset_password():
             # this is for deployement pourpose
             # return jsonify({'data': {"message": 'Login required to access this page'}}), 401
             return jsonify({'data': {"message": 'Token is invalid!'}}), 401
-
-
