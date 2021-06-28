@@ -1,20 +1,22 @@
 import { useState, useCallback, Fragment } from "react";
 import { useHistory, useParams } from "react-router";
 import useSendData from "../../hooks/use-sendData";
-import ResetPassword from "./ResetPassword";
-import ResetConfPassword from "./ResetConfPassword";
+import Password from "../../UI/Password";
+import ConfPassword from "../../UI/ConfPassword";
 import Card from "../../UI/Card";
 import Button from "../../UI/Button";
 import LoadingSpinner from "../../UI/LoadingSpinner";
 import Modal from "../../UI/Modal";
 
-import classes from "./ResetPasswordForm.module.css";
+import classes from "./Form.module.css";
 
 const ResetPasswordForm = () => {
   const [passwordData, setPasswordData] = useState({});
   const [confPasswordData, setConfPasswordData] = useState({});
   const params = useParams();
-  const history = useHistory()
+  const history = useHistory();
+
+  const url = "/reset_password";
 
   const {
     inputIsValid: success,
@@ -52,25 +54,25 @@ const ResetPasswordForm = () => {
       password: passwordData.passwordInputValue,
       token: params.token,
     };
-    sendInput("/reset_password", "submit", newData);
+    sendInput(url, "submit", newData);
   };
 
   const modalClickHandler = () => {
-    resetState()
-    if(success){
-      history.push('/login')
+    resetState();
+    if (success) {
+      history.push("/login");
     }
-  }
+  };
 
   return (
     <Fragment>
       <Card className={classes.form}>
         <form onSubmit={submitHandler}>
-          <ResetPassword onPassPasswordData={passPasswordData} />
-          <ResetConfPassword
+          <Password onPassPasswordData={passPasswordData} url={url} />
+          <ConfPassword
             onPassConfPasswordData={passConfPasswordData}
             passwordInputValue={passwordData.passwordInputValue}
-          />
+           />
           <Button disabled={!formIsValid} type="submit">
             Submit
           </Button>

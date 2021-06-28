@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
 import Card from "../../UI/Card";
 import Button from "../../UI/Button";
-import Username from "./Username";
-import Email from "./Email";
-import Password from "./Password";
-import ConfPassword from "./ConfPassword";
+import Username from "../../UI/Username";
+import Email from "../../UI/Email";
+import Password from "../../UI/Password";
+import ConfPassword from "../../UI/ConfPassword";
 
 import classes from "./UserForm.module.css";
 
@@ -68,9 +68,9 @@ const UserForm = (props) => {
   return (
     <Card className={classes.form}>
       <form onSubmit={onSubmitHandler}>
-        <Username onPassNameData={passNameData} url={url} />
-        <Email onPassEmailData={passEmailData} url={url} />
-        <Password onPassPasswordData={passPasswordData} url={url} />
+        <Username onPassNameData={passNameData} url={url} register={true} />
+        <Email onPassEmailData={passEmailData} url={url} register={true} />
+        <Password onPassPasswordData={passPasswordData} url={url} register={true} />
         <ConfPassword
           onPassConfPasswordData={passConfPasswordData}
           passwordInputValue={passwordData.passwordInputValue}

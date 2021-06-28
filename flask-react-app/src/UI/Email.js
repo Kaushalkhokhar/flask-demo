@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import useInput from "../../hooks/use-input";
-import useSendData from "../../hooks/use-sendData"
+import useInput from "../hooks/use-input";
+import useSendData from "../hooks/use-sendData";
 
-import classes from "./LoginEmail.module.css";
+import classes from "./Input.module.css";
 
-const LoginEmail = (props) => {
+const Email = (props) => {
   const {
     enteredValue: emailInputValue,
     isTouched: emailIsTouched,
@@ -16,37 +16,43 @@ const LoginEmail = (props) => {
   const {
     inputIsValid: emailInputIsValid,
     errorResponse: emailErrorResponse,
+    successResponse: success,
     sendInput,
   } = useSendData();
 
-  const { onPassEmail: passEmailData } = props;
+  const { onPassEmailData: passEmailData } = props;
 
   useEffect(() => {
-    if(!emailIsTouched) {
-      return
+    if (!emailIsTouched) {
+      return;
     }
     const identifier = setTimeout(() => {
-      sendInput("/login", "email", emailInputValue);
+      sendInput(props.url, "email", emailInputValue);
     }, 500);
     return () => {
       clearTimeout(identifier);
     };
-  }, [emailInputValue, emailIsTouched, sendInput]);
+  }, [emailIsTouched, emailInputValue, sendInput]);
 
   useEffect(()=>{
     passEmailData({emailInputValue, emailInputIsValid});
-  },[passEmailData, emailInputValue, emailInputIsValid])
+  },[passEmailData, emailInputValue, emailInputIsValid,])
+
+  const emailInputClasses =
+    !emailInputIsValid && emailIsTouched
+      ? `${classes["form-control"]} ${classes.invalid}`
+      : classes["form-control"];
 
   return (
-    <div className={classes["form-control"]}>
-      <label htmlFor="email">Enter Email</label>
+    <div className={emailInputClasses}>
+      <label htmlFor="email">Your E-mail</label>
       <input
-        type="text"
+        type="email"
         id="email"
         onChange={emailChangeHandler}
         onBlur={emailBlurHandler}
         value={emailInputValue}
-        placeholder="Your Email"
+        placeholder="Email"
       />
       {emailErrorResponse && !emailDeFocused && (
         <p className={classes["info-text"]}>{emailErrorResponse}</p>
@@ -54,8 +60,11 @@ const LoginEmail = (props) => {
       {emailErrorResponse && emailDeFocused && (
         <p className={classes["error-text"]}>{emailErrorResponse}</p>
       )}
+      {props.register &&  emailInputIsValid && (
+        <p className={classes["valid-text"]}>{success.message}</p>
+      )}
     </div>
   );
 };
 
-export default LoginEmail;
+export default Email;

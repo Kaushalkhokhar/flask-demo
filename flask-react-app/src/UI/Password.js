@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import useSendData from "../../hooks/use-sendData";
-import useInput from "../../hooks/use-input";
-import classes from "./Password.module.css";
+import useSendData from "../hooks/use-sendData";
+import useInput from "../hooks/use-input";
+
+import classes from "./Input.module.css";
 
 const Password = (props) => {
   const {
@@ -14,6 +15,7 @@ const Password = (props) => {
   const {
     inputIsValid: passwordInputIsValid,
     errorResponse: passwordErrorResponse,
+    successResponse: success,
     sendInput,
   } = useSendData();
 
@@ -57,13 +59,8 @@ const Password = (props) => {
       {passwordErrorResponse && passwordDeFocused && (
         <p className={classes["error-text"]}>{passwordErrorResponse}</p>
       )}
-      {!passwordErrorResponse &&
-        passwordDeFocused &&
-        passwordInputValue.trim().length === 0 && (
-          <p className={classes["error-text"]}>Password can not be blank</p>
-        )}
-      {passwordInputIsValid && (
-        <p className={classes["valid-text"]}>Password is valid</p>
+      { props.register && passwordInputIsValid && (
+        <p className={classes["valid-text"]}>{success.message}</p>
       )}
     </div>
   );

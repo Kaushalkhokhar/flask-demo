@@ -1,17 +1,20 @@
 import { useState, Fragment, useCallback } from "react";
 import { useHistory } from "react-router";
 import useSendData from "../../hooks/use-sendData";
-import ResetEmail from "./ResetEmail";
+import Email from "../../UI/Email";
 import Button from "../../UI/Button";
 import Card from "../../UI/Card";
 import LoadingSpinner from "../../UI/LoadingSpinner";
 import Modal from "../../UI/Modal";
 
-import classes from "./ResetEmailForm.module.css";
+import classes from "./Form.module.css";
 
 const ResetEmailForm = () => {
   const [emailData, setEmailData] = useState({});
   const history = useHistory();
+
+  const url = "/reset_request"
+
   const {
     inputIsValid: success,
     errorResponse: error,
@@ -38,7 +41,7 @@ const ResetEmailForm = () => {
       email: emailData.emailInputValue,
     };
 
-    sendInput("/reset_request", "submit", newData);
+    sendInput(url, "submit", newData);
   };
 
   const modalClickHandler = () => {
@@ -52,7 +55,7 @@ const ResetEmailForm = () => {
     <Fragment>
       <Card className={classes.form}>
         <form onSubmit={submitHandler}>
-          <ResetEmail onPassEmailData={passEmailData} />
+          <Email onPassEmailData={passEmailData} url={url}/>
           <Button type="submit" disabled={!formIsValid}>
             Send Request
           </Button>

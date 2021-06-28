@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import useInput from "../../hooks/use-input";
+import useInput from "../hooks/use-input";
 
-import classes from "./ResetConfPassword.module.css";
+import classes from "./Input.module.css";
 
 const ConfPassword = (props) => {
   const {
@@ -12,13 +12,13 @@ const ConfPassword = (props) => {
     inputBlurHandler: confPasswordBlurHandler,
   } = useInput();
 
-  
+  const { onPassConfPasswordData: passConfPasswordData } = props;
+
   let confPasswordInputIsValid = false
   if (props.passwordInputValue === confPasswordInputValue) {
     confPasswordInputIsValid = true
   }
-  const { onPassConfPasswordData: passConfPasswordData } = props;
-  
+
   useEffect(() => {
     passConfPasswordData({confPasswordInputIsValid});
   }, [passConfPasswordData, confPasswordInputIsValid]);
@@ -30,7 +30,7 @@ const ConfPassword = (props) => {
 
   return (
     <div className={confPasswordInputClasses}>
-      <label htmlFor="confPassword">Your Confirm Password</label>
+      <label htmlFor="confPassword">Your E-mail</label>
       <input
         type="password"
         id="confPassword"

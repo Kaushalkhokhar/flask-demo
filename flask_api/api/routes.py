@@ -55,6 +55,10 @@ def register():
 
     if user['type'] == "username":
         username = user['value']
+
+        if len(username) == 0:
+            return jsonify({"data": {"message": "Username can not be blank"}}), 401
+
         # remove backslash(/) from start and end when copy regex from javascript
         # username_validation = r"^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$"
         username_validation = r"^[a-zA-Z0-9]+$" 
@@ -74,6 +78,10 @@ def register():
 
     elif user['type'] == "email":
         email = user['value']
+
+        if len(email) == 0:
+            return jsonify({"data": {"message": "Email can not be blank"}}), 401
+    
         email_validation = r'^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
         email_match = re.match(email_validation, email)
         if email_match is None:
@@ -86,6 +94,10 @@ def register():
         
     elif user['type'] == "password":
         password = user["value"]
+
+        if len(password) == 0:
+            return jsonify({"data": {"message": "Password can not be blank"}}), 401
+
         password_validation = r'^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$'
         password_match = re.match(password_validation, password)
         if password_match is None:
@@ -124,11 +136,15 @@ def login():
                                 datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'], algorithm="HS256")
         return jsonify({'data':{"message": "You have logged in successfully", "payload": token}}), 201
 
-    if not user or not user['value'] or not user['type']:
-        return jsonify({"data": {"message": 'Please enter some value'}}), 401
+    if not user or not user['type']:
+        return jsonify({"data": {"message": 'Something went wrong'}}), 401
         
     if user.get('type') == 'email':
         email = user['value']
+
+        if len(email) == 0:
+            return jsonify({"data": {"message": 'Email can not be blank'}}), 401
+
         user = User.query.filter_by(email=email).first()
         if not user:
             return jsonify({"data": {"message": 'Please enter valid email'}}), 401
@@ -138,7 +154,7 @@ def login():
         password = user['value']
 
         if not len(password) > 0:
-            return jsonify({"data": {"message": 'Password can not be blank.Please enter some data'}}), 401
+            return jsonify({"data": {"message": 'Password can not be blank'}}), 401
 
         password_validation = r'^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$'
         password_match = re.match(password_validation, password)
@@ -202,13 +218,25 @@ def reset_request():
 def reset_password():
     user = request.get_json()
 
+    if user.get('type') == "password":
+        password = user.get("value")
+        if not len(password) > 0:
+            return jsonify({"data": {"message": 'Password can not be blank'}}), 401
+
+        password_validation = r'^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$'
+        password_match = re.match(password_validation, password)
+        if password_match is None:
+            return jsonify({"data": {"message": """Password must be of 8 character should include special character(i.e
+        @/#/$/% etc.), a-z, A-Z and 0-9. i.e Example@1234"""}}), 401
+        return jsonify({"data": {"message":'Valid password'}}), 201
+
     if user.get('type') == 'submit':
         userData = user.get('value')
 
         token = userData.get('token')
 
         if not token:
-            #  this is for deployement pourpose
+            # this is for deployement pourpose
             # return jsonify({"data": {"message": 'Login required to access this page}}), 401
             return jsonify({"data": {"message": 'Token is missing'}}), 401
 
@@ -222,7 +250,7 @@ def reset_password():
             return jsonify({"data": {"message": "Your password has been updated!You are now able to log in"}}), 201
 
         except:
-            #  this is for deployement pourpose
+            # this is for deployement pourpose
             # return jsonify({'data': {"message": 'Login required to access this page'}}), 401
             return jsonify({'data': {"message": 'Token is invalid!'}}), 401
 

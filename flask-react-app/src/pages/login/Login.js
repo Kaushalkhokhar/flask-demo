@@ -5,19 +5,21 @@ import Card from "../../UI/Card";
 import Button from "../../UI/Button";
 import Modal from "../../UI/Modal";
 import LoadingSpinner from "../../UI/LoadingSpinner";
-import LoginEmail from "./LoginEmail";
-import LoginPassword from "./LoginPassword";
+import Email from "../../UI/Email";
+import Password from "../../UI/Password";
 
 import useSendData from "../../hooks/use-sendData";
 import classes from "./Login.module.css";
 import { useHistory } from "react-router";
 
 const Login = () => {
-  const history = useHistory()
+  const history = useHistory();
   const ctx = useContext(AuthContext);
   const [emailData, setEmailData] = useState({});
   const [passwordData, setPasswordData] = useState({});
-  
+
+  const url = "/login";
+
   const {
     errorResponse: error,
     successResponse,
@@ -25,31 +27,31 @@ const Login = () => {
     sendInput,
     resetState,
   } = useSendData();
-  
+
   const passEmailData = useCallback((data) => {
     setEmailData(data);
-  },[]);
-  
+  }, []);
+
   const passPasswordData = useCallback((data) => {
     setPasswordData(data);
-  },[]);
-  
+  }, []);
+
   let formIsValid = false;
-  
+
   if (emailData.emailInputIsValid && passwordData.passwordInputIsValid) {
     formIsValid = true;
   }
-  
+
   const { token, tokenHandler } = ctx;
   useEffect(() => {
     if (token) {
-      history.push('/home')
+      history.push("/home");
       return;
     }
     tokenHandler(successResponse.payload);
   }, [successResponse, token, history, tokenHandler]);
 
-  const submitHandler = (event) => {  
+  const submitHandler = (event) => {
     event.preventDefault();
 
     // This need only when we don't disable submit button
@@ -58,9 +60,9 @@ const Login = () => {
     // }
     const userData = {
       email: emailData.emailInputValue,
-      password: passwordData.passwordInputValue
-    }
-    sendInput('/login', "submit", userData);
+      password: passwordData.passwordInputValue,
+    };
+    sendInput(url, "submit", userData);
   };
 
   const modalClickHandler = () => {
@@ -72,8 +74,8 @@ const Login = () => {
       {!isLoading && (
         <Card className={classes.form}>
           <form onSubmit={submitHandler}>
-            <LoginEmail onPassEmail={passEmailData} />
-            <LoginPassword onPassPassword={passPasswordData} />
+            <Email onPassEmailData={passEmailData} url={url} />
+            <Password onPassPasswordData={passPasswordData} url={url} />
             <Button type="submit" disabled={!formIsValid}>
               Login
             </Button>

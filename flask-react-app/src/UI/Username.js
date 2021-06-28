@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import useInput from "../../hooks/use-input";
-import useSendData from "../../hooks/use-sendData";
-import classes from "./Username.module.css";
+import useInput from "../hooks/use-input";
+import useSendData from "../hooks/use-sendData";
+
+import classes from "./Input.module.css";
 
 const Username = (props) => {
   const {
@@ -23,7 +24,7 @@ const Username = (props) => {
 
   useEffect(() => {
     if (!nameIsTouched) {
-      return
+      return;
     }
     const identifier = setTimeout(() => {
       sendInput(props.url, "username", nameInputValue);
@@ -33,9 +34,9 @@ const Username = (props) => {
     };
   }, [nameInputValue, nameIsTouched, sendInput]);
 
-  useEffect(()=>{
-    passNameData({nameInputValue, nameInputIsValid});
-  },[passNameData, nameInputValue, nameInputIsValid])
+  useEffect(() => {
+    passNameData({ nameInputValue, nameInputIsValid });
+  }, [passNameData, nameInputValue, nameInputIsValid]);
 
   const nameInputClasses =
     !nameInputIsValid && nameIsTouched
@@ -59,12 +60,7 @@ const Username = (props) => {
       {nameErrorResponse && nameDeFocused && (
         <p className={classes["error-text"]}>{nameErrorResponse}</p>
       )}
-      {/* {!nameErrorResponse &&
-        nameDeFocused &&
-        nameInputValue.trim().length === 0 && (
-          <p className={classes["error-text"]}>Usename can not be blank</p>
-        )} */}
-      {nameInputIsValid && (
+      {props.register && nameInputIsValid && (
         <p className={classes["valid-text"]}>{success.message}</p>
       )}
     </div>
