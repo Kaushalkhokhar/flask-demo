@@ -2,9 +2,12 @@ from flask import Blueprint
 from flask import jsonify
 from api.users.utils import login_required
 
-main = Blueprint('main', __name__)
+main = Blueprint('main', __name__, static_folder='../../../flask-react-app/build', static_url_path='/')
 
-@main.route('/about')
+
+
+
+@main.route('/api/about')
 @login_required
 def about(current_user):
     username = current_user.username
