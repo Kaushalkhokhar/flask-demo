@@ -7,8 +7,13 @@ const AuthContext = React.createContext({
 
 export const AuthContextProvider = (props) => {
   const [token, setToken] = useState(false);
-  const tokenHandler = useCallback((token) => {
-    setToken(token);
+  const tokenHandler = useCallback((data) => {
+    if (data) {
+      localStorage.setItem('token', data)
+    } else {
+      localStorage.removeItem('token')
+    }
+    setToken(data);
   }, []);
 
   return (

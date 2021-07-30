@@ -1,3 +1,7 @@
+## Copying files from Windows to WSL linux(ubuntu)
+- cp -r /mnt/d/Photo_Editor ~/python
+    - Here d/(name-of-floder to copy) ~/(name-of-destination-folder)
+
 ## Basic Flask and React App creation
 
 - React
